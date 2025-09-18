@@ -37,7 +37,7 @@ export function Game() {
 
         <div className="d-flex flex-column gap-1">
             {players.map((player, playerIndex) => <div key={player}>
-                <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button onClick={() => {
+                <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button key={symbol} onClick={() => {
                     makeMove(gameId, player, symbol).then(game => setData({id: gameId, game}))
                 }} disabled={lastPlayer === player}>
                     {symbol}
