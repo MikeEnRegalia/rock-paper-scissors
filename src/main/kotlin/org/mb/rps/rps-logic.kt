@@ -24,20 +24,18 @@ fun Game.makeMove(move: Move): Game {
     if (moves.size < players.size) return copy(rounds = rounds.dropLast(1) + lastRound.copy(moves = moves))
 
     val wins = buildList {
-        for (player in players) for (otherPlayer in players) {
-            if (player > otherPlayer) {
-                val playerSymbol = moves.single { it.by == player }.symbol
-                val otherPlayerSymbol = moves.single { it.by == otherPlayer }.symbol
+        for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
+            val playerSymbol = moves.single { it.by == player }.symbol
+            val otherPlayerSymbol = moves.single { it.by == otherPlayer }.symbol
 
-                when (val result = computeResult(playerSymbol, otherPlayerSymbol)) {
-                    DRAW -> continue
-                    WIN, LOSS -> add(
-                        Win(
-                            if (result == WIN) player else otherPlayer,
-                            if (result == WIN) otherPlayer else player
-                        )
+            when (val result = computeResult(playerSymbol, otherPlayerSymbol)) {
+                DRAW -> continue
+                WIN, LOSS -> add(
+                    Win(
+                        if (result == WIN) player else otherPlayer,
+                        if (result == WIN) otherPlayer else player
                     )
-                }
+                )
             }
         }
     }
