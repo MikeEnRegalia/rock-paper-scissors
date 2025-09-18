@@ -27,17 +27,13 @@ fun Game.makeMove(move: Move): Game {
 
     val wins = buildList {
         for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
-            val playerSymbol = moves.single { it.by == player }.symbol
-            val otherPlayerSymbol = moves.single { it.by == otherPlayer }.symbol
+            val symbol = moves.single { it.by == player }.symbol
+            val otherSymbol = moves.single { it.by == otherPlayer }.symbol
 
-            when (val result = computeResult(playerSymbol, otherPlayerSymbol)) {
+            when (computeResult(symbol, otherSymbol)) {
                 DRAW -> continue
-                WIN, LOSS -> add(
-                    Win(
-                        if (result == WIN) player else otherPlayer,
-                        if (result == WIN) otherPlayer else player
-                    )
-                )
+                WIN -> add(Win(player, otherPlayer))
+                LOSS -> add(Win(otherPlayer, player))
             }
         }
     }
@@ -45,12 +41,23 @@ fun Game.makeMove(move: Move): Game {
     return copy(doneRounds = doneRounds + DoneRound(moves = moves, wins = wins), openRound = OpenRound())
 }
 
-fun computeResult(playerSymbol: GameSymbol, otherPlayerSymbol: GameSymbol) = when {
-    playerSymbol == otherPlayerSymbol -> DRAW
-    else -> when (playerSymbol) {
-        ROCK -> if (otherPlayerSymbol == SCISSORS) WIN else LOSS
-        PAPER -> if (otherPlayerSymbol == ROCK) WIN else LOSS
-        SCISSORS -> if (otherPlayerSymbol == PAPER) WIN else LOSS
+fun computeResult(symbol: GameSymbol, otherSymbol: GameSymbol) = when (symbol) {
+    ROCK -> when (otherSymbol) {
+        SCISSORS -> WIN
+        ROCK -> DRAW
+        PAPER -> LOSS
+    }
+
+    PAPER -> when (otherSymbol) {
+        ROCK -> WIN
+        PAPER -> DRAW
+        SCISSORS -> LOSS
+    }
+
+    SCISSORS -> when (otherSymbol) {
+        PAPER -> WIN
+        SCISSORS -> DRAW
+        ROCK -> LOSS
     }
 }
 
