@@ -8,12 +8,17 @@ interface GameAndId {
 
 interface Game {
     players: string[]
-    rounds: Round[]
+    doneRounds: DoneRound[]
+    openRound: OpenRound
 }
 
-interface Round {
+interface DoneRound {
     moves: Move[]
     wins: Win[]
+}
+
+interface OpenRound {
+    moves: Move[]
 }
 
 interface Move {
@@ -41,13 +46,13 @@ export function Game() {
     }
 
     const {id: gameId, game} = data
-    const {players, rounds} = game
+    const {players, doneRounds, openRound} = game
 
-    const lastPlayers = rounds.length == 0 ? null : rounds[rounds.length - 1].moves.map(move => move.by)
+    const lastPlayers = openRound.moves.map(move => move.by)
 
     return <>
         Score: {players.map((player, playerIndex) => <span
-        key={player}>player #{playerIndex + 1}: {rounds.flatMap(round => round.wins.filter(win => win.winner === player)).length} </span>)}
+        key={player}>player #{playerIndex + 1}: {doneRounds.flatMap(round => round.wins.filter(win => win.winner === player)).length} </span>)}
 
         <div className="d-flex flex-column gap-1">
             {players.map((player, playerIndex) => <div key={player}>

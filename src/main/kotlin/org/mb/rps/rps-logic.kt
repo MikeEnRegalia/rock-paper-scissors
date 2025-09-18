@@ -8,20 +8,22 @@ enum class GameResult { WIN, DRAW, LOSS }
 
 data class Game(
     val players: List<String> = listOf(),
-    val rounds: List<Round> = listOf(Round())
+    val doneRounds: List<DoneRound> = listOf(),
+    val openRound: OpenRound = OpenRound()
 )
 
-data class Round(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
+data class DoneRound(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
+data class OpenRound(val moves: List<Move> = listOf())
+
 data class Move(val by: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Game.canMove(player: String) = rounds.last().moves.none { it.by == player }
+fun Game.canMove(player: String) = openRound.moves.none { it.by == player }
 fun Game.makeMove(move: Move): Game {
-    val lastRound = rounds.last()
-    if (lastRound.moves.any { it.by == move.by }) throw IllegalStateException()
+    if (openRound.moves.any { it.by == move.by }) throw IllegalStateException()
 
-    val moves = lastRound.moves + move
-    if (moves.size < players.size) return copy(rounds = rounds.dropLast(1) + lastRound.copy(moves = moves))
+    val moves = openRound.moves + move
+    if (moves.size < players.size) return copy(openRound = openRound.copy(moves = moves))
 
     val wins = buildList {
         for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
@@ -40,7 +42,7 @@ fun Game.makeMove(move: Move): Game {
         }
     }
 
-    return copy(rounds = rounds.dropLast(1) + lastRound.copy(moves = moves, wins = wins) + Round())
+    return copy(doneRounds = doneRounds + DoneRound(moves = moves, wins = wins), openRound = OpenRound())
 }
 
 fun computeResult(playerSymbol: GameSymbol, otherPlayerSymbol: GameSymbol) = when {
