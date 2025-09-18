@@ -2,10 +2,12 @@ package org.mb.rps.rockpaperscissors
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mb.rps.rockpaperscissors.GameSymbol.PAPER
-import org.mb.rps.rockpaperscissors.GameSymbol.ROCK
-import org.mb.rps.rockpaperscissors.RpsController.GameCreatedResponse
-import org.mb.rps.rockpaperscissors.RpsController.MakeMovePayload
+import org.mb.rps.Game
+import org.mb.rps.GameSymbol.PAPER
+import org.mb.rps.GameSymbol.ROCK
+import org.mb.rps.RpsController
+import org.mb.rps.RpsController.GameCreatedResponse
+import org.mb.rps.RpsController.MakeMovePayload
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT

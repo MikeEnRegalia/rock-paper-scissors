@@ -1,4 +1,4 @@
-package org.mb.rps.rockpaperscissors
+package org.mb.rps
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
