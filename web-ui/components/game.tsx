@@ -8,8 +8,22 @@ interface GameAndId {
 
 interface Game {
     players: string[]
-    moves: {by: string, symbol: GameSymbol}[]
-    scores: Record<string, number>
+    rounds: Round[]
+}
+
+interface Round {
+    moves: Move[]
+    wins: Win[]
+}
+
+interface Move {
+    by: string
+    symbol: GameSymbol
+}
+
+interface Win {
+    winner: string
+    loser: string
 }
 
 type GameSymbol = 'ROCK' | 'PAPER' | 'SCISSORS'
@@ -27,19 +41,19 @@ export function Game() {
     }
 
     const {id: gameId, game} = data
-    const {players, moves, scores} = game
+    const {players, rounds} = game
 
-    const lastPlayer = moves.length == 0 ? null : moves[moves.length - 1].by
+    const lastPlayers = rounds.length == 0 ? null : rounds[rounds.length - 1].moves.map(move => move.by)
 
     return <>
         Score: {players.map((player, playerIndex) => <span
-        key={player}>player #{playerIndex + 1}: {scores[player] ?? 0} </span>)}
+        key={player}>player #{playerIndex + 1}: {rounds.flatMap(round => round.wins.filter(win => win.winner === player)).length} </span>)}
 
         <div className="d-flex flex-column gap-1">
             {players.map((player, playerIndex) => <div key={player}>
                 <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button key={symbol} onClick={() => {
                     makeMove(gameId, player, symbol).then(game => setData({id: gameId, game}))
-                }} disabled={lastPlayer === player}>
+                }} disabled={lastPlayers?.includes(player)}>
                     {symbol}
                 </Button>)}</div></div>
             </div>)}

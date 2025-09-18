@@ -1,29 +1,31 @@
 package org.mb.rps
 
 import org.mb.rps.GameSymbol.*
-import java.util.UUID.randomUUID
 
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 
 data class Game(
-    val players: List<String> = listOf(randomUUID(), randomUUID()).map { it.toString() },
-    val moves: List<Move> = listOf(),
-    val scores: Map<String, Int> = computeScores(players, moves)
+    val players: List<String> = listOf(),
+    val rounds: List<Round> = listOf(Round())
 )
 
-fun Game.nextPlayers() = when {
-    moves.isEmpty() -> players
-    else -> players.filter { it != moves.last().by }
-}
+data class Round(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
+data class Move(val by: String, val symbol: GameSymbol)
+data class Win(val winner: String, val loser: String)
 
-fun computeScores(players: List<String>, moves: List<Move>) = moves
-    .chunked(players.size)
-    .filter { it.size == players.size }
-    .fold(players.associateWith { 0 }.toMutableMap()) { acc, moveList ->
+fun Game.canMove(player: String) =  rounds.last().moves.none { it.by == player }
+fun Game.makeMove(move: Move): Game {
+    val lastRound = rounds.last()
+    if (lastRound.moves.any { it.by == move.by }) throw IllegalStateException()
+
+    val moves = lastRound.moves + move
+    if (moves.size < players.size) return copy(rounds = rounds.dropLast(1) + lastRound.copy(moves = moves))
+
+    val wins = buildList {
         for (player in players) for (otherPlayer in players) {
             if (player > otherPlayer) {
-                val playerSymbol = moveList.single { it.by == player }.symbol
-                val otherPlayerSymbol = moveList.single { it.by == otherPlayer }.symbol
+                val playerSymbol = moves.single { it.by == player }.symbol
+                val otherPlayerSymbol = moves.single { it.by == otherPlayer }.symbol
                 if (playerSymbol == otherPlayerSymbol) continue
 
                 val playerWon = when (playerSymbol) {
@@ -32,16 +34,17 @@ fun computeScores(players: List<String>, moves: List<Move>) = moves
                     SCISSORS -> otherPlayerSymbol == PAPER
                 }
 
-                acc.compute(if (playerWon) player else otherPlayer) { _, acc -> (acc ?: 0) + 1 }
+                add(
+                    Win(
+                        if (playerWon) player else otherPlayer,
+                        if (playerWon) otherPlayer else player
+                    )
+                )
             }
         }
-        acc
     }
 
-fun Game.makeMove(move: Move): Game {
-    if (move.by !in nextPlayers()) throw IllegalStateException()
-    val newMoves = moves + move
-    return copy(moves = newMoves, scores = computeScores(players, newMoves))
+    val newLastRound = lastRound.copy(moves = moves, wins = wins)
+    return copy(rounds = rounds.dropLast(1) + newLastRound + Round())
 }
 
-data class Move(val by: String, val symbol: GameSymbol)
