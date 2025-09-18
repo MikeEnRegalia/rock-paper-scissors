@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 class RpsRepository {
     private val games = mutableMapOf<String, Game>()
 
-    fun createGame(id: String, players: List<String>) = id to Game(players = players)
+    fun createGame(id: String, game: Game) = id to game
         .also { games[id] = it }
 
     fun getGame(gameId: String): Game? = games[gameId]

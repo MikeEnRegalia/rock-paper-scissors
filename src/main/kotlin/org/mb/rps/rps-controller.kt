@@ -17,7 +17,10 @@ class RpsController(private val repo: RpsRepository) {
 
     @PostMapping("/games")
     fun createGame(): ResponseEntity<GameCreatedResponse> = ok(
-        repo.createGame(randomUUID().toString(), listOf(randomUUID(), randomUUID()).map { it.toString() }).let { (id, game) -> GameCreatedResponse(id, game) }
+        repo.createGame(
+            randomUUID().toString(),
+            Game(listOf(randomUUID(), randomUUID()).map { it.toString() })
+        ).let { (id, game) -> GameCreatedResponse(id, game) }
     )
 
     data class MakeMovePayload(val player: String, val symbol: GameSymbol)
