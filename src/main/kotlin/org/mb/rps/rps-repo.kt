@@ -4,14 +4,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class RpsRepository {
-    private val games = mutableMapOf<String, Game>()
+    private val matches = mutableMapOf<String, Match>()
 
-    fun createGame(id: String, game: Game) = id to game
-        .also { games[id] = it }
+    fun createMatch(id: String, match: Match) = id to match
+        .also { matches[id] = it }
 
-    fun getGame(gameId: String): Game? = games[gameId]
+    fun getMatch(id: String): Match? = matches[id]
 
-    fun updateGame(gameId: String, game: Game) {
-        games[gameId] = game
+    fun updateMatch(id: String, match: Match) {
+        matches[id] = match
     }
 }

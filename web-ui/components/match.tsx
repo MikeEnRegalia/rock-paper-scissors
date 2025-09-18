@@ -1,23 +1,23 @@
 import {useState} from 'react'
 import {Button} from 'react-bootstrap'
 
-interface GameAndId {
+interface MatchAndId {
     id: string
-    game: Game
+    match: Match
 }
 
-interface Game {
+interface Match {
     players: string[]
-    doneRounds: DoneRound[]
-    openRound: OpenRound
+    playedGames: PlayedGame[]
+    currentGame: OpenGame
 }
 
-interface DoneRound {
+interface PlayedGame {
     moves: Move[]
     wins: Win[]
 }
 
-interface OpenRound {
+interface OpenGame {
     moves: Move[]
 }
 
@@ -34,8 +34,8 @@ interface Win {
 type GameSymbol = 'ROCK' | 'PAPER' | 'SCISSORS'
 const gameSymbols: GameSymbol[] = ['ROCK', 'PAPER', 'SCISSORS']
 
-export function Game() {
-    const [data, setData] = useState<GameAndId | null>(null)
+export function Match() {
+    const [data, setData] = useState<MatchAndId | null>(null)
     const createGameCallback: () => void = () => createGame()
         .then(game => setData(game))
 
@@ -45,19 +45,20 @@ export function Game() {
         return createGameButton
     }
 
-    const {id: gameId, game} = data
-    const {players, doneRounds, openRound} = game
+    const {id: matchId, match} = data
+    const {players, playedGames, currentGame} = match
 
-    const lastPlayers = openRound.moves.map(move => move.by)
+    const lastPlayers = currentGame.moves.map(move => move.by)
 
     return <>
         Score: {players.map((player, playerIndex) => <span
-        key={player}>player #{playerIndex + 1}: {doneRounds.flatMap(round => round.wins.filter(win => win.winner === player)).length} </span>)}
+        key={player}>player #{playerIndex + 1}: {playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length} </span>)}
 
         <div className="d-flex flex-column gap-1">
             {players.map((player, playerIndex) => <div key={player}>
-                <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button key={symbol} onClick={() => {
-                    makeMove(gameId, player, symbol).then(game => setData({id: gameId, game}))
+                <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button
+                    key={symbol} onClick={() => {
+                    makeMove(matchId, player, symbol).then(match => setData({id: matchId, match}))
                 }} disabled={lastPlayers?.includes(player)}>
                     {symbol}
                 </Button>)}</div></div>
@@ -69,24 +70,24 @@ export function Game() {
 
 
         <pre className="mt-4 text-body-tertiary">
-            {JSON.stringify(game, null, 4)}
+            {JSON.stringify(match, null, 4)}
         </pre>
     </>
 }
 
 async function createGame() {
-    const url = 'http://localhost:8080/rps/games'
+    const url = 'http://localhost:8080/rps/matches'
     const response = await fetch(url, {method: 'POST'})
-    return await response.json() as GameAndId
+    return await response.json() as MatchAndId
 }
 
-async function makeMove(gameId: string, player: string, symbol: GameSymbol) {
-    const url = `http://localhost:8080/rps/games/${gameId}/moves`
+async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
+    const url = `http://localhost:8080/rps/matches/${matchId}/moves`
     const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({player, symbol}),
         headers: {'Content-Type': 'application/json'}
     })
-    return await response.json() as Game
+    return await response.json() as Match
 
 }

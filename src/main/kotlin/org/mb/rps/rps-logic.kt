@@ -27,24 +27,24 @@ fun computeResult(symbol: GameSymbol, otherSymbol: GameSymbol) = when (symbol) {
 }
 
 
-data class Game(
+data class Match(
     val players: List<String> = listOf(),
-    val doneRounds: List<DoneRound> = listOf(),
-    val openRound: OpenRound = OpenRound()
+    val playedGames: List<PlayedGame> = listOf(),
+    val currentGame: CurrentGame = CurrentGame()
 )
 
-data class DoneRound(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
-data class OpenRound(val moves: List<Move> = listOf())
+data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
+data class CurrentGame(val moves: List<Move> = listOf())
 
 data class Move(val by: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Game.canMove(player: String) = openRound.moves.none { it.by == player }
-fun Game.makeMove(move: Move): Game {
-    if (openRound.moves.any { it.by == move.by }) throw IllegalStateException()
+fun Match.canMove(player: String) = currentGame.moves.none { it.by == player }
+fun Match.makeMove(move: Move): Match {
+    if (currentGame.moves.any { it.by == move.by }) throw IllegalStateException()
 
-    val newMoves = openRound.moves + move
-    if (newMoves.size < players.size) return copy(openRound = openRound.copy(moves = newMoves))
+    val newMoves = currentGame.moves + move
+    if (newMoves.size < players.size) return copy(currentGame = currentGame.copy(moves = newMoves))
 
     val wins = buildList {
         for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
@@ -59,5 +59,5 @@ fun Game.makeMove(move: Move): Game {
         }
     }
 
-    return copy(doneRounds = doneRounds + DoneRound(moves = newMoves, wins = wins), openRound = OpenRound())
+    return copy(playedGames = playedGames + PlayedGame(moves = newMoves, wins = wins), currentGame = CurrentGame())
 }

@@ -13,27 +13,27 @@ import java.util.UUID.randomUUID
 @CrossOrigin
 class RpsController(private val repo: RpsRepository) {
 
-    data class GameCreatedResponse(val id: String, val game: Game)
+    data class MatchCreatedResponse(val id: String, val match: Match)
 
-    @PostMapping("/games")
-    fun createGame(): ResponseEntity<GameCreatedResponse> = ok(
-        repo.createGame(
+    @PostMapping("/matches")
+    fun createMatch(): ResponseEntity<MatchCreatedResponse> = ok(
+        repo.createMatch(
             randomUUID().toString(),
-            Game(listOf(randomUUID(), randomUUID()).map { it.toString() })
-        ).let { (id, game) -> GameCreatedResponse(id, game) }
+            Match(listOf(randomUUID(), randomUUID()).map { it.toString() })
+        ).let { (id, match) -> MatchCreatedResponse(id, match) }
     )
 
     data class MakeMovePayload(val player: String, val symbol: GameSymbol)
 
-    @PostMapping("/games/{gameId}/moves")
-    fun makeMove(@PathVariable gameId: String, @RequestBody move: MakeMovePayload): ResponseEntity<Game> {
-        val game = repo.getGame(gameId) ?: throw ResponseStatusException(NOT_FOUND)
-        if (move.player !in game.players) throw ResponseStatusException(BAD_REQUEST, "player is unknown")
-        if (!game.canMove(move.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
+    @PostMapping("/matches/{matchId}/moves")
+    fun makeMove(@PathVariable matchId: String, @RequestBody move: MakeMovePayload): ResponseEntity<Match> {
+        val match = repo.getMatch(matchId) ?: throw ResponseStatusException(NOT_FOUND)
+        if (move.player !in match.players) throw ResponseStatusException(BAD_REQUEST, "player is unknown")
+        if (!match.canMove(move.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
 
-        val oldState = repo.getGame(gameId) ?: throw IllegalStateException()
+        val oldState = repo.getMatch(matchId) ?: throw IllegalStateException()
         val newState = oldState.makeMove(Move(move.player, move.symbol))
-        repo.updateGame(gameId, newState)
+        repo.updateMatch(matchId, newState)
         return ok(newState)
     }
 }

@@ -2,11 +2,11 @@ package org.mb.rps.rockpaperscissors
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mb.rps.Game
+import org.mb.rps.Match
 import org.mb.rps.GameSymbol.PAPER
 import org.mb.rps.GameSymbol.ROCK
 import org.mb.rps.RpsController
-import org.mb.rps.RpsController.GameCreatedResponse
+import org.mb.rps.RpsController.MatchCreatedResponse
 import org.mb.rps.RpsController.MakeMovePayload
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -38,7 +38,7 @@ class RockpaperscissorsApplicationTests {
         val (id, game) = restTemplate.postForObject(
                 "http://localhost:$port/rps/games",
                 "",
-                GameCreatedResponse::class.java)
+                MatchCreatedResponse::class.java)
 
         assertThat(game.players).hasSize(2)
         assertThat(game.players.toSet()).hasSize(2)
@@ -46,22 +46,22 @@ class RockpaperscissorsApplicationTests {
         assertThat(game.scores.keys).isEqualTo(game.players.toSet())
         assertThat(game.scores.values).allMatch { it == 0 }
 
-        val gameAfterFirstMove = restTemplate.postForObject(
+        val matchAfterFirstMove = restTemplate.postForObject(
             "http://localhost:$port/rps/games/$id/moves",
             MakeMovePayload(game.players[0], ROCK),
-            Game::class.java)
+            Match::class.java)
 
-        assertThat(gameAfterFirstMove.moves).isNotEmpty
-        assertThat(gameAfterFirstMove.scores.values).allMatch { it == 0 }
+        assertThat(matchAfterFirstMove.moves).isNotEmpty
+        assertThat(matchAfterFirstMove.scores.values).allMatch { it == 0 }
 
-        val gameAfterSecondMove = restTemplate.postForObject(
+        val matchAfterSecondMove = restTemplate.postForObject(
             "http://localhost:$port/rps/games/$id/moves",
             MakeMovePayload(game.players[1], PAPER),
-            Game::class.java)
+            Match::class.java)
 
-        println(gameAfterSecondMove)
+        println(matchAfterSecondMove)
 
-        assertThat(gameAfterSecondMove.scores[game.players[0]]).isEqualTo(0)
-        assertThat(gameAfterSecondMove.scores[game.players[1]]).isEqualTo(1)
+        assertThat(matchAfterSecondMove.scores[game.players[0]]).isEqualTo(0)
+        assertThat(matchAfterSecondMove.scores[game.players[1]]).isEqualTo(1)
     }
 }
