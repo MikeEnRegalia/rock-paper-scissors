@@ -29,9 +29,9 @@ class RpsController(private val service: RpsService) {
         ok(service.createGame().let { (id, game) -> GameCreatedResponse(id, game) })
 
 
-data class MapeMovePayload(val player: String, val symbol: GameSymbol)
+data class MakeMovePayload(val player: String, val symbol: GameSymbol)
     @PostMapping("/games/{gameId}/moves")
-    fun makeMove(@RequestBody move: MapeMovePayload) {
+    fun makeMove(@RequestBody move: MakeMovePayload) {
 
     }
 }
