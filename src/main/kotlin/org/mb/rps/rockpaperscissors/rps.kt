@@ -55,6 +55,7 @@ data class Move(val by: String, val symbol: GameSymbol)
 
 @RestController
 @RequestMapping("/rps")
+@CrossOrigin
 class RpsController(private val service: RpsService) {
 
     data class GameCreatedResponse(val id: String, val game: Game)
