@@ -3,6 +3,7 @@
 import {Alert, Button, Spinner} from 'react-bootstrap'
 import {useRouter} from 'next/navigation'
 import useSWR from 'swr'
+import Link from 'next/link'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
@@ -47,14 +48,16 @@ export function CreateMatchButton() {
     return <Button onClick={createGameCallback}>New Match</Button>
 }
 
-export function Match({matchId}: { matchId: string }) {
+export function Match({matchId, player: you}: { matchId: string, player: string }) {
     const {
         data,
         isLoading,
         error,
         mutate
     } = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
-        refreshInterval: 1000
+        refreshInterval: (data) =>
+            data?.players.every(player => player === you ||
+                data?.currentGame?.moves?.some(move => move.player === player)) ? 0 : 1000
     })
 
     const errorUI = error && <>
@@ -88,12 +91,13 @@ export function Match({matchId}: { matchId: string }) {
     return <>
         {loadingUI}
         <h1>Rock Paper Scissors</h1>
+        <CreateMatchButton/>
         <div className="d-flex flex-column gap-1">
             <table className="table">
                 <thead>
                 <tr>
                     {players.map((player, playerIndex) => <th key={player} style={{width: '30%'}}>
-                        Player {playerIndex + 1}: {score(player)} {player == winner ?
+                        {you === player ? 'You' : <>Player {playerIndex + 1}</>}: {score(player)} {player == winner ?
                         <span className="small text-success">[WINNER]</span> : null}
                     </th>)}
                     <th></th>
@@ -111,16 +115,20 @@ export function Match({matchId}: { matchId: string }) {
                 </tr>
                 <tr>
                     {players.map((player, playerIndex) => <td key={player} className="align-middle">
-                        {lastPlayers?.includes(player) ? currentGame.moves.find(m => m.player === player)?.symbol :
-                            <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
-                                <Button
-                                    key={symbol} onClick={() => {
-                                    makeMove(matchId, player, symbol)
-                                        .then(match => mutate(match))
-                                        .catch(err => console.log(err))
+                        {you === player
+                            ? (lastPlayers?.includes(player) ? currentGame.moves.find(m => m.player === player)?.symbol :
+                                <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
+                                    <Button
+                                        key={symbol} onClick={() => {
+                                        makeMove(matchId, player, symbol)
+                                            .then(match => mutate(match))
+                                            .catch(err => console.log(err))
 
-                                }}>{symbol}</Button>)}
-                            </div>}
+                                    }}>{symbol}</Button>)}
+                                </div>)
+                            : (lastPlayers?.includes(player) ? <>Moved</> :
+                                <Link href={`/matches/${matchId}/players/${player}`} target="_blank">Awaiting
+                                    Move</Link>)}
                     </td>)}
                     <td></td>
                 </tr>

@@ -24,8 +24,7 @@ In this prototype there is no persistence, but of course it can be added by expa
 
 There is rudimentary support in that the logic works, but the frontend as well as the Match data would need to be extended to properly show the scoring to the user
 
-### Play against a real human by sharing a match link
+### Polling the Match Data
 
-This can be done by implementing routes for match players and either polling for moves or implementing something like a websocket or other forms of server pushing content to the client.
-
+For production, such a use case would require push communication from the server (for instance using websockets).
 
