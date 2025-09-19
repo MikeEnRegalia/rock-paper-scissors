@@ -1,5 +1,10 @@
-import {useState} from 'react'
+'use client'
+
 import {Button} from 'react-bootstrap'
+import {useRouter} from 'next/navigation'
+import useSWR from 'swr'
+
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 interface MatchAndId {
     id: string
@@ -34,20 +39,23 @@ interface Win {
 type GameSymbol = 'ROCK' | 'PAPER' | 'SCISSORS'
 const gameSymbols: GameSymbol[] = ['ROCK', 'PAPER', 'SCISSORS']
 
-export function Match() {
-    const [data, setData] = useState<MatchAndId | null>(null)
+export function CreateMatchButton() {
+    const router = useRouter()
     const createGameCallback: () => void = () => createGame()
-        .then(game => setData(game))
+        .then(data => router.push(`/matches/${data.id}/players/${data.match.players[0]}`))
         .catch(err => console.log(err))
+    return <Button onClick={createGameCallback}>New Game</Button>
+}
 
-    const createGameButton = <Button onClick={createGameCallback}>New Game</Button>
-
+export function Match({matchId}: { matchId: string }) {
+    const {data, mutate} = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
+        refreshInterval: 1000
+    })
     if (data == null) {
-        return createGameButton
+        return null
     }
 
-    const {id: matchId, match} = data
-    const {players, playedGames, currentGame} = match
+    const {players, playedGames, currentGame} = data
 
     const lastPlayers = currentGame.moves.map(move => move.player)
 
@@ -62,7 +70,8 @@ export function Match() {
                 <thead>
                 <tr>
                     {players.map((player, playerIndex) => <th key={player} style={{width: '30%'}}>
-                        Player {playerIndex + 1}: {score(player)} {player == winner ? <span className="small text-success">[WINNER]</span> : null}
+                        Player {playerIndex + 1}: {score(player)} {player == winner ?
+                        <span className="small text-success">[WINNER]</span> : null}
                     </th>)}
                     <th></th>
                 </tr>
@@ -84,27 +93,22 @@ export function Match() {
                                 <Button
                                     key={symbol} onClick={() => {
                                     makeMove(matchId, player, symbol)
-                                        .then(match => setData({id: matchId, match}))
+                                        .then(match => mutate(match))
                                         .catch(err => console.log(err))
 
-                                }}>
-                                    {symbol}
-                                </Button>)}</div>}
+                                }}>{symbol}</Button>)}
+                            </div>}
                     </td>)}
                     <td></td>
                 </tr>
 
-                <tr>
-                    <th colSpan={players.length}>{createGameButton}</th>
-                    <th></th>
-                </tr>
                 </tbody>
             </table>
         </div>
 
 
         <pre className="small mt-4 text-body-tertiary">
-            {JSON.stringify(match, null, 4)}
+            {JSON.stringify(data, null, 4)}
         </pre>
     </>
 }
@@ -118,8 +122,6 @@ function getMoveCSS(game: PlayedGame, player: string) {
     }
     return 'text-body-tertiary'
 }
-
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 async function createGame() {
     const url = `${backendUrl}/matches`
@@ -140,4 +142,18 @@ async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
 
     return await response.json() as Match
 
+}
+
+async function swrFetcher(url: string) {
+    const res = await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+
+    if (!res.ok) {
+        throw new Error(`Error: ${res.status} ${res.statusText}`)
+    }
+
+    return await res.json()
 }

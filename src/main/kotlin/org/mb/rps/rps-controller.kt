@@ -23,6 +23,11 @@ class RpsController(private val repo: RpsRepository) {
         ).let { (id, match) -> MatchCreatedResponse(id, match) }
     )
 
+    @GetMapping("/matches/{id}")
+    fun getMatch(@PathVariable("id") id: String): ResponseEntity<Match> {
+        return ok(repo.getMatch(id))
+    }
+
     data class MakeMovePayload(val player: String, val symbol: GameSymbol)
 
     @PostMapping("/matches/{matchId}/moves")
