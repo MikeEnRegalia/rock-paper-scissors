@@ -1,6 +1,6 @@
 'use client'
 
-import {Button} from 'react-bootstrap'
+import {Alert, Button, Spinner} from 'react-bootstrap'
 import {useRouter} from 'next/navigation'
 import useSWR from 'swr'
 
@@ -44,15 +44,36 @@ export function CreateMatchButton() {
     const createGameCallback: () => void = () => createGame()
         .then(data => router.push(`/matches/${data.id}/players/${data.match.players[0]}`))
         .catch(err => console.log(err))
-    return <Button onClick={createGameCallback}>New Game</Button>
+    return <Button onClick={createGameCallback}>New Match</Button>
 }
 
 export function Match({matchId}: { matchId: string }) {
-    const {data, mutate} = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
+    const {
+        data,
+        isLoading,
+        error,
+        mutate
+    } = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
         refreshInterval: 1000
     })
+
+    const errorUI = error && <>
+        <Alert variant="danger">The match could not be loaded.</Alert>
+        <CreateMatchButton/>
+    </>
+
+    const loadingUI = isLoading && <Spinner className="float-end"/>
+
     if (data == null) {
-        return null
+        return <>
+            {loadingUI}
+            <h1>Rock Paper Scissors</h1>
+            {errorUI}
+        </>
+    }
+
+    if (error) {
+        return errorUI
     }
 
     const {players, playedGames, currentGame} = data
@@ -65,6 +86,8 @@ export function Match({matchId}: { matchId: string }) {
     const winner = score(rankedPlayers[1]) < score(rankedPlayers[0]) ? rankedPlayers[0] : null
 
     return <>
+        {loadingUI}
+        <h1>Rock Paper Scissors</h1>
         <div className="d-flex flex-column gap-1">
             <table className="table">
                 <thead>
@@ -146,9 +169,7 @@ async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
 
 async function swrFetcher(url: string) {
     const res = await fetch(url, {
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: {'Content-Type': 'application/json',}
     })
 
     if (!res.ok) {

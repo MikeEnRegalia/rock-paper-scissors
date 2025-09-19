@@ -3,6 +3,7 @@ package org.mb.rps
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.notFound
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
@@ -25,7 +26,7 @@ class RpsController(private val repo: RpsRepository) {
 
     @GetMapping("/matches/{id}")
     fun getMatch(@PathVariable("id") id: String): ResponseEntity<Match> {
-        return ok(repo.getMatch(id))
+        return repo.getMatch(id)?.let { ok(it) } ?: notFound().build()
     }
 
     data class MakeMovePayload(val player: String, val symbol: GameSymbol)
