@@ -22,7 +22,7 @@ interface OpenGame {
 }
 
 interface Move {
-    by: string
+    player: string
     symbol: GameSymbol
 }
 
@@ -48,7 +48,7 @@ export function Match() {
     const {id: matchId, match} = data
     const {players, playedGames, currentGame} = match
 
-    const lastPlayers = currentGame.moves.map(move => move.by)
+    const lastPlayers = currentGame.moves.map(move => move.player)
 
     return <>
         Score: {players.map((player, playerIndex) => <span

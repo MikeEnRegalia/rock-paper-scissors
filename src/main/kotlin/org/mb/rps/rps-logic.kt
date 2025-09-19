@@ -36,20 +36,20 @@ data class Match(
 data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
 data class CurrentGame(val moves: List<Move> = listOf())
 
-data class Move(val by: String, val symbol: GameSymbol)
+data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Match.canMove(player: String) = currentGame.moves.none { it.by == player }
+fun Match.canMove(player: String) = currentGame.moves.none { it.player == player }
 fun Match.makeMove(move: Move): Match {
-    if (currentGame.moves.any { it.by == move.by }) throw IllegalStateException()
+    if (currentGame.moves.any { it.player == move.player }) throw IllegalStateException()
 
     val newMoves = currentGame.moves + move
     if (newMoves.size < players.size) return copy(currentGame = currentGame.copy(moves = newMoves))
 
     val wins = buildList {
         for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
-            val symbol = newMoves.single { it.by == player }.symbol
-            val otherSymbol = newMoves.single { it.by == otherPlayer }.symbol
+            val symbol = newMoves.single { it.player == player }.symbol
+            val otherSymbol = newMoves.single { it.player == otherPlayer }.symbol
 
             when (computeResult(symbol, otherSymbol)) {
                 DRAW -> continue
