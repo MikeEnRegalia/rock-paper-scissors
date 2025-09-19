@@ -38,6 +38,7 @@ export function Match() {
     const [data, setData] = useState<MatchAndId | null>(null)
     const createGameCallback: () => void = () => createGame()
         .then(game => setData(game))
+        .catch(err => console.log(err))
 
     const createGameButton = <Button onClick={createGameCallback}>New Game</Button>
 
@@ -58,7 +59,10 @@ export function Match() {
             {players.map((player, playerIndex) => <div key={player}>
                 <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button
                     key={symbol} onClick={() => {
-                    makeMove(matchId, player, symbol).then(match => setData({id: matchId, match}))
+                    makeMove(matchId, player, symbol)
+                        .then(match => setData({id: matchId, match}))
+                        .catch(err => console.log(err))
+
                 }} disabled={lastPlayers?.includes(player)}>
                     {symbol}
                 </Button>)}</div></div>
@@ -78,6 +82,8 @@ export function Match() {
 async function createGame() {
     const url = 'http://localhost:8080/rps/matches'
     const response = await fetch(url, {method: 'POST'})
+    if (response.status != 200) throw new Error(response.statusText)
+
     return await response.json() as MatchAndId
 }
 
@@ -88,6 +94,8 @@ async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
         body: JSON.stringify({player, symbol}),
         headers: {'Content-Type': 'application/json'}
     })
+    if (response.status != 200) throw new Error(response.statusText)
+
     return await response.json() as Match
 
 }
