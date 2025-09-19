@@ -51,25 +51,54 @@ export function Match() {
 
     const lastPlayers = currentGame.moves.map(move => move.player)
 
+    const score = (player: string) => playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length
+
     return <>
-        Score: {players.map((player, playerIndex) => <span
-        key={player}>player #{playerIndex + 1}: {playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length} </span>)}
-
         <div className="d-flex flex-column gap-1">
-            {players.map((player, playerIndex) => <div key={player}>
-                <div>Player {playerIndex + 1}: <div className="d-inline-flex gap-1">{gameSymbols.map(symbol => <Button
-                    key={symbol} onClick={() => {
-                    makeMove(matchId, player, symbol)
-                        .then(match => setData({id: matchId, match}))
-                        .catch(err => console.log(err))
+            <table className="table">
+                <thead>
+                <tr>
+                    {players.map((player, playerIndex) => <th key={player} style={{width: '30%'}}>
+                        Player {playerIndex + 1}: {score(player)}
+                    </th>)}
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {playedGames.map((game, i) => <tr key={i}>
+                    {players.map(player => <td key={player} className={
+                        game.wins.some(win => win.winner === player) ? 'text-primary' : 'text-decoration-line-through'
+                    }>
+                        {game.moves.find(m => m.player === player)?.symbol}
+                    </td>)}
+                    <td></td>
+                </tr>)}
+                <tr>
 
-                }} disabled={lastPlayers?.includes(player)}>
-                    {symbol}
-                </Button>)}</div></div>
-            </div>)}
-            <div>
-                {createGameButton}
-            </div>
+                </tr>
+                <tr>
+                    {players.map((player, playerIndex) => <td key={player}>
+                        {lastPlayers?.includes(player) ? currentGame.moves.find(m => m.player === player)?.symbol :
+                            <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
+                                <Button
+                                    key={symbol} onClick={() => {
+                                    makeMove(matchId, player, symbol)
+                                        .then(match => setData({id: matchId, match}))
+                                        .catch(err => console.log(err))
+
+                                }}>
+                                    {symbol}
+                                </Button>)}</div>}
+                    </td>)}
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <th colSpan={players.length}>{createGameButton}</th>
+                    <th></th>
+                </tr>
+                </tbody>
+            </table>
         </div>
 
 
