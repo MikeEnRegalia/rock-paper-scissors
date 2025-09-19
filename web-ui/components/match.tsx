@@ -79,8 +79,10 @@ export function Match() {
     </>
 }
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
+
 async function createGame() {
-    const url = 'http://localhost:8080/rps/matches'
+    const url = `${backendUrl}/matches`
     const response = await fetch(url, {method: 'POST'})
     if (response.status != 200) throw new Error(response.statusText)
 
@@ -88,7 +90,7 @@ async function createGame() {
 }
 
 async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
-    const url = `http://localhost:8080/rps/matches/${matchId}/moves`
+    const url = `${backendUrl}/matches/${matchId}/moves`
     const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify({player, symbol}),
