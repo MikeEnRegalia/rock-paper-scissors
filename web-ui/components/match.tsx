@@ -53,22 +53,23 @@ export function Match() {
 
     const score = (player: string) => playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length
 
+    const rankedPlayers = [...players].sort((a, b) => score(b) - score(a))
+    const winner = score(rankedPlayers[1]) < score(rankedPlayers[0]) ? rankedPlayers[0] : null
+
     return <>
         <div className="d-flex flex-column gap-1">
             <table className="table">
                 <thead>
                 <tr>
                     {players.map((player, playerIndex) => <th key={player} style={{width: '30%'}}>
-                        Player {playerIndex + 1}: {score(player)}
+                        Player {playerIndex + 1}: {score(player)} {player == winner ? <span className="small text-success">[WINNER]</span> : null}
                     </th>)}
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 {playedGames.map((game, i) => <tr key={i}>
-                    {players.map(player => <td key={player} className={
-                        game.wins.some(win => win.winner === player) ? 'text-primary' : 'text-decoration-line-through'
-                    }>
+                    {players.map(player => <td key={player} className={getMoveCSS(game, player)}>
                         {game.moves.find(m => m.player === player)?.symbol}
                     </td>)}
                     <td></td>
@@ -77,7 +78,7 @@ export function Match() {
 
                 </tr>
                 <tr>
-                    {players.map((player, playerIndex) => <td key={player}>
+                    {players.map((player, playerIndex) => <td key={player} className="align-middle">
                         {lastPlayers?.includes(player) ? currentGame.moves.find(m => m.player === player)?.symbol :
                             <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
                                 <Button
@@ -102,10 +103,20 @@ export function Match() {
         </div>
 
 
-        <pre className="mt-4 text-body-tertiary">
+        <pre className="small mt-4 text-body-tertiary">
             {JSON.stringify(match, null, 4)}
         </pre>
     </>
+}
+
+function getMoveCSS(game: PlayedGame, player: string) {
+    if (game.wins.some(win => win.winner === player)) {
+        return 'text-success'
+    }
+    if (game.wins.some(win => win.loser === player)) {
+        return 'text-danger text-decoration-line-through'
+    }
+    return 'text-body-tertiary'
 }
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
