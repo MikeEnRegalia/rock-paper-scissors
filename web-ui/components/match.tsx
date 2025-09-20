@@ -53,16 +53,23 @@ export function CreateMatchButton() {
     return <Button onClick={onClick}>New Match</Button>
 }
 
+function hasMoved(currentGame: OpenGame, player: string) {
+    return currentGame?.moves?.some(move => move.player === player)
+}
+
+function othersHaveMoved(match: Match, you: string) {
+    return  match.players.every(p => p === you || hasMoved(match.currentGame, p))
+}
+
 export function Match({matchId, player: you}: { matchId: string, player: string }) {
+
     const {
         data,
         isLoading,
         error,
         mutate
     } = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
-        refreshInterval: (data) =>
-            data?.players.every(player => player === you ||
-                data?.currentGame?.moves?.some(move => move.player === player)) ? 0 : 1000
+        refreshInterval: data => data && othersHaveMoved(data, you) ? 0 : 1000
     })
 
     if (error) return <>
