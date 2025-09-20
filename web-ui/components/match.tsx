@@ -119,7 +119,7 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             </thead>
             <tbody>
             {playedGames.map((game, i) => <tr key={i}>
-                {players.map(player => <td key={player} className={getMoveCSS(game, player)}>
+                {players.map(player => <td key={player} className={getMoveCSS(game.wins, player)}>
                     {game.moves.find(m => m.player === player)?.symbol}
                 </td>)}
                 <td></td>
@@ -138,9 +138,9 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
     </>
 }
 
-function getMoveCSS(game: PlayedGame, player: string) {
-    if (game.wins.some(win => win.winner === player)) return 'text-success'
-    if (game.wins.some(win => win.loser === player)) return 'text-danger text-decoration-line-through'
+function getMoveCSS(wins: Win[], player: string) {
+    if (wins.some(win => win.winner === player)) return 'text-success'
+    if (wins.some(win => win.loser === player)) return 'text-danger text-decoration-line-through'
     return 'text-body-tertiary'
 }
 
