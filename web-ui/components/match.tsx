@@ -44,8 +44,8 @@ export function CreateMatchButton() {
     const router = useRouter()
     const onClick = async () => {
         try {
-            const data = await createGame()
-            router.push(`/matches/${data.id}/players/${data.match.players[0]}`)
+            const {id, match} = await createGame()
+            router.push(`/matches/${id}/players/${match.players[0]}`)
         } catch (error) {
             console.log(error)
         }
