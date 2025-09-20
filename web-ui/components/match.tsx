@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
-interface MatchAndId {
+interface MatchWithId {
     id: string
     match: Match
 }
@@ -62,14 +62,13 @@ function othersHaveMoved(match: Match, you: string) {
 }
 
 export function Match({matchId, player: you}: { matchId: string, player: string }) {
-
     const {
         data,
         isLoading,
         error,
         mutate
     } = useSWR<Match>(`${backendUrl}/matches/${matchId}`, swrFetcher, {
-        refreshInterval: data => data && othersHaveMoved(data, you) ? 0 : 1000
+        refreshInterval: (data => data && othersHaveMoved(data, you) ? 0 : 1000)
     })
 
     if (error) return <>
@@ -100,8 +99,7 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         return madeMove
             ? currentGame.moves.find(m => m.player === player)?.symbol
             : <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
-                <Button
-                    key={symbol} onClick={async () => {
+                <Button key={symbol} onClick={async () => {
                     try {
                         await mutate(await makeMove(matchId, player, symbol))
                     } catch (error) {
@@ -155,7 +153,7 @@ function getMoveCSS(wins: Win[], player: string) {
 async function createGame() {
     const response = await fetch(`${backendUrl}/matches`, {method: 'POST'})
     if (!response.ok) throw new Error(response.statusText)
-    return await response.json() as MatchAndId
+    return await response.json() as MatchWithId
 }
 
 async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
