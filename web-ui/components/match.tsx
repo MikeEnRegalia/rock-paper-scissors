@@ -58,7 +58,7 @@ function hasMoved(currentGame: OpenGame, player: string) {
 }
 
 function othersHaveMoved(match: Match, you: string) {
-    return  match.players.every(p => p === you || hasMoved(match.currentGame, p))
+    return match.players.every(p => p === you || hasMoved(match.currentGame, p))
 }
 
 export function Match({matchId, player: you}: { matchId: string, player: string }) {
@@ -101,11 +101,12 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             ? currentGame.moves.find(m => m.player === player)?.symbol
             : <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
                 <Button
-                    key={symbol} onClick={() => {
-                    makeMove(matchId, player, symbol)
-                        .then(match => mutate(match))
-                        .catch(err => console.log(err))
-
+                    key={symbol} onClick={async () => {
+                    try {
+                        await mutate(await makeMove(matchId, player, symbol))
+                    } catch (error) {
+                        console.log(error)
+                    }
                 }}>{symbol}</Button>)}
             </div>
     }
