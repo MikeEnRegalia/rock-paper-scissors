@@ -42,7 +42,7 @@ const gameSymbols: GameSymbol[] = ['ROCK', 'PAPER', 'SCISSORS']
 
 export function CreateMatchButton() {
     const router = useRouter()
-    const createGameCallback: () => void = async () => {
+    const onClick = async () => {
         try {
             const data = await createGame()
             router.push(`/matches/${data.id}/players/${data.match.players[0]}`)
@@ -50,7 +50,7 @@ export function CreateMatchButton() {
             console.log(error)
         }
     }
-    return <Button onClick={createGameCallback}>New Match</Button>
+    return <Button onClick={onClick}>New Match</Button>
 }
 
 export function Match({matchId, player: you}: { matchId: string, player: string }) {
