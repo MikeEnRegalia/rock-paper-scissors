@@ -141,10 +141,16 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             <tr>
 
             </tr>
-            {winner == null && <tr>
-                {players.map(player => <td key={player} className="align-middle"><PlayerUI player={player}/></td>)}
-                <td></td>
-            </tr>
+            {winner == null
+                ? <tr>
+                    {players.map(player => <td key={player} className="align-middle"><PlayerUI player={player}/></td>)}
+                    <td></td>
+                </tr>
+                : <tr>
+                    <th colSpan={players.length + 1}>
+                        Game over. {you === winner ? 'You won!' : 'You lost!'}
+                    </th>
+                </tr>
             }
             </tbody>
         </table>
