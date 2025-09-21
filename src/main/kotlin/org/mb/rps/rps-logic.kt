@@ -6,11 +6,11 @@ import org.mb.rps.GameSymbol.*
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 enum class GameResult { WIN, DRAW, LOSS }
 
-fun computeResult(player: GameSymbol, opponent: GameSymbol) = when {
-    player == ROCK && opponent == SCISSORS -> WIN
-    player == SCISSORS && opponent == PAPER -> WIN
-    player == PAPER && opponent == ROCK -> WIN
-    player == opponent -> DRAW
+fun GameSymbol.playAgainst(opponent: GameSymbol) = when {
+    this == ROCK && opponent == SCISSORS -> WIN
+    this == SCISSORS && opponent == PAPER -> WIN
+    this == PAPER && opponent == ROCK -> WIN
+    this == opponent -> DRAW
     else -> LOSS
 }
 
@@ -37,18 +37,14 @@ fun Match.makeMove(move: Move): Match {
     }
 }
 
-private fun Match.computeWins(newMoves: List<Move>): List<Win> {
-    val wins = playerPairings().mapNotNull { (player, opponent) ->
-        val symbol = newMoves.single { it.player == player }.symbol
-        val otherSymbol = newMoves.single { it.player == opponent }.symbol
-
-        when (computeResult(symbol, otherSymbol)) {
-            DRAW -> null
-            WIN -> Win(player, opponent)
-            LOSS -> Win(opponent, player)
-        }
+private fun Match.computeWins(newMoves: List<Move>) = playerPairings().mapNotNull { (player, opponent) ->
+    when (newMoves.by(player).playAgainst(newMoves.by(opponent))) {
+        DRAW -> null
+        WIN -> Win(player, opponent)
+        LOSS -> Win(opponent, player)
     }
-    return wins
 }
+
+private fun List<Move>.by(player: String) = single { it.player == player }.symbol
 
 private fun Match.playerPairings() = players.flatMap { p -> players.filter { it > p }.map { p to it } }
