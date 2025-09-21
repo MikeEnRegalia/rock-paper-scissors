@@ -81,7 +81,7 @@ class ApiTests {
 
     private fun makeMove(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
-        RpsController.MakeMovePayload(player, symbol),
+        RpsController.MovePayload(player, symbol),
         Match::class.java
     )
 }

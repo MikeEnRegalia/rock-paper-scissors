@@ -13,33 +13,28 @@ import java.util.UUID.randomUUID
 @RequestMapping("/rps")
 @CrossOrigin
 class RpsController(private val repo: RpsRepository) {
-
     data class MatchCreatedResponse(val id: String, val match: Match)
 
     @PostMapping("/matches")
     fun createMatch(): ResponseEntity<MatchCreatedResponse> = ok(
-        repo.createMatch(
-            randomUUID().toString(),
-            Match(listOf(randomUUID(), randomUUID()).map { it.toString() })
-        ).let { (id, match) -> MatchCreatedResponse(id, match) }
+        repo.createMatch(randomUUID().toString(), Match(listOf(randomUUID(), randomUUID()).map { it.toString() }))
+            .let { (id, match) -> MatchCreatedResponse(id, match) }
     )
 
     @GetMapping("/matches/{id}")
-    fun getMatch(@PathVariable("id") id: String): ResponseEntity<Match> {
-        return repo.getMatch(id)?.let { ok(it) } ?: notFound().build()
-    }
+    fun getMatch(@PathVariable("id") id: String): ResponseEntity<Match> =
+        repo.getMatch(id)?.let { ok(it) } ?: notFound().build()
 
-    data class MakeMovePayload(val player: String, val symbol: GameSymbol)
+    data class MovePayload(val player: String, val symbol: GameSymbol)
 
     @PostMapping("/matches/{matchId}/moves")
-    fun makeMove(@PathVariable matchId: String, @RequestBody move: MakeMovePayload): ResponseEntity<Match> {
+    fun makeMove(@PathVariable matchId: String, @RequestBody req: MovePayload): ResponseEntity<Match> {
         val match = repo.getMatch(matchId) ?: throw ResponseStatusException(NOT_FOUND)
-        if (move.player !in match.players) throw ResponseStatusException(BAD_REQUEST, "player is unknown")
-        if (!match.canMove(move.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
+        if (req.player !in match.players) throw ResponseStatusException(BAD_REQUEST, "player is unknown")
+        if (!match.canMove(req.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
 
-        val oldState = repo.getMatch(matchId) ?: throw IllegalStateException()
-        val newState = oldState.makeMove(Move(move.player, move.symbol))
-        repo.updateMatch(matchId, newState)
-        return ok(newState)
+        val newMatch = match.makeMove(Move(req.player, req.symbol))
+        repo.updateMatch(matchId, newMatch)
+        return ok(newMatch)
     }
 }
