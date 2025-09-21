@@ -1,6 +1,6 @@
 'use client'
 
-import {Alert, Button, Spinner} from 'react-bootstrap'
+import {Alert, Button, DropdownButton, DropdownItem, Spinner} from 'react-bootstrap'
 import {useRouter} from 'next/navigation'
 import useSWR from 'swr'
 import Link from 'next/link'
@@ -95,18 +95,18 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         const madeMove = lastPlayers?.includes(player)
         if (you !== player) return madeMove
             ? <>Moved</>
-            : <Link href={`/matches/${matchId}/players/${player}`} target="_blank">Awaiting Move</Link>
+            : <Link href={`/matches/${matchId}/players/${player}`} target="_blank">Waiting</Link>
         return madeMove
             ? currentGame.moves.find(m => m.player === player)?.symbol
-            : <div className="d-inline-flex gap-1">{gameSymbols.map(symbol =>
-                <Button key={symbol} onClick={async () => {
+            : <DropdownButton title="Move">{gameSymbols.map(symbol =>
+                <DropdownItem key={symbol} onClick={async () => {
                     try {
                         await mutate(await makeMove(matchId, player, symbol))
                     } catch (error) {
                         console.log(error)
                     }
-                }}>{symbol}</Button>)}
-            </div>
+                }}>{symbol}</DropdownItem>)}
+            </DropdownButton>
     }
 
     return <>
@@ -116,10 +116,11 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         <table className="table">
             <thead>
             <tr>
-                {players.map((player, playerIndex) => <th key={player} style={{width: '30%'}}>
-                    {you === player ? 'You' : <>Player {playerIndex + 1}</>}: {score(player)} {player == winner ?
-                    <span className="small text-success">[WINNER]</span> : null}
-                </th>)}
+                {players.map((player, playerIndex) =>
+                    <th key={player} className="text-nowrap" style={{width: '30%'}}>
+                        {you === player ? 'You' : <>Player {playerIndex + 1}</>}: {score(player)} {player == winner ?
+                        <span className="small text-success">[WINNER]</span> : null}
+                    </th>)}
                 <th></th>
             </tr>
             </thead>
