@@ -52,7 +52,7 @@ export function CreateMatchButton() {
             console.log(error)
         }
     }
-    return <Button onClick={onClick}>New Match</Button>
+    return <Button onClick={onClick} variant="link">New Match</Button>
 }
 
 function hasMoved(currentGame: OpenGame, player: string) {
@@ -102,7 +102,8 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         const madeMove = lastPlayers?.includes(player)
         if (you !== player) return madeMove
             ? <>Moved</>
-            : <Link href={`/matches/${matchId}/players/${player}`} target="_blank">Waiting</Link>
+            : <><Link href={`/matches/${matchId}/players/${player}`} target="_blank">Waiting</Link> <Spinner
+                size="sm"/></>
         return madeMove
             ? currentGame.moves.find(m => m.player === player)?.symbol
             : <DropdownButton title="Move">{gameSymbols.map(symbol =>
