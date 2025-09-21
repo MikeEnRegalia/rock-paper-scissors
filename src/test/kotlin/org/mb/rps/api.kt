@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus.*
 import java.util.UUID.randomUUID
+import kotlin.test.expect
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApiTests {
@@ -59,7 +60,7 @@ class ApiTests {
             "http://localhost:$port/rps/matches/${randomUUID()}",
             String::class.java
         )
-        assertThat(response.statusCode).isEqualTo(NOT_FOUND)
+        expect(NOT_FOUND) { response.statusCode }
     }
 
     @Test

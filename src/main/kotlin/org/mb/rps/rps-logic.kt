@@ -39,7 +39,7 @@ data class CurrentGame(val moves: List<Move> = listOf())
 data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Match.canMove(player: String) = currentGame.moves.none { it.player == player }
+fun Match.canMove(player: String) = player in players && currentGame.moves.none { it.player == player }
 fun Match.makeMove(move: Move): Match {
     if (currentGame.moves.any { it.player == move.player }) throw IllegalStateException()
 
