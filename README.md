@@ -41,4 +41,6 @@ The code is prepared for CQRS a little bit: There are basically two commands (PO
 ### TODO
 
 - refactor api so that players cannot see each other's moves
+- use SWR for the two POST endpoints
+- show errors for all SWR hooks
 
