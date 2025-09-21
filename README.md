@@ -38,3 +38,7 @@ It is a little redundant, but putting the match id inside the Match class simpli
 
 The code is prepared for CQRS a little bit: There are basically two commands (POST endpoints) and one query (GET endpoint). In this implementation there is no separation, but we could introduce a more basic repository which only stores the matches (id, player ids) and moves, and upon each match creation and move update the more elaborate view currently represented by the Match class.
 
+### TODO
+
+- refactor api so that players cannot see each other's moves
+
