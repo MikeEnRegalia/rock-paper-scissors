@@ -7,6 +7,6 @@ export const metadata: Metadata = {
     description: 'Play Rock Paper Scissors!',
 }
 
-export default ({children}: Readonly<{ children: ReactNode }>) => <html lang="en">
+export default ({children}: Readonly<{ children: ReactNode }>) => <html lang="en" data-bs-theme="dark">
 <body className="p-2">{children}</body>
 </html>
