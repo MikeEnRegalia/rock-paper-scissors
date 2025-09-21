@@ -28,3 +28,7 @@ There is rudimentary support in that the logic works, but the frontend as well a
 
 For production, such a use case would require push communication from the server (for instance using websockets).
 
+### Error Handling
+
+In the backend the error handling is implemented with exceptions in a redundant way both in the controllers and in the game model. This should be refactored to use return values. Can be done via sealed interfaces or more elegantly with Rich Errors (Kotlin 2.4+)
+
