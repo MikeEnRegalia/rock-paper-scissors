@@ -83,8 +83,10 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         <h1>Rock Paper Scissors</h1>
     </>
 
-    const {players, playedGames, currentGame} = data
+    const {players: originalPlayers, playedGames, currentGame} = data
     const lastPlayers = currentGame.moves.map(move => move.player)
+
+    const players = [you, ...originalPlayers.filter(p => p != you)]
 
     const score = (player: string) => playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length
 
@@ -116,9 +118,9 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         <table className="table">
             <thead>
             <tr>
-                {players.map((player, playerIndex) =>
+                {players.map(player =>
                     <th key={player} className="text-nowrap" style={{width: '30%'}}>
-                        {you === player ? 'You' : <>Player {playerIndex + 1}</>}: {score(player)} {player == winner ?
+                        {you === player ? 'You' : <>Opponent</>}: {score(player)} {player == winner ?
                         <span className="small text-success">[WINNER]</span> : null}
                     </th>)}
                 <th></th>
