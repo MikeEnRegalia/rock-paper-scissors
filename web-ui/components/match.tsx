@@ -7,6 +7,8 @@ import Link from 'next/link'
 
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
+const winningGames = 3
+
 interface MatchWithId {
     id: string
     match: Match
@@ -91,7 +93,10 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
     const score = (player: string) => playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length
 
     const rankedPlayers = [...players].sort((a, b) => score(b) - score(a))
-    const winner = score(rankedPlayers[1]) < score(rankedPlayers[0]) ? rankedPlayers[0] : null
+    const haveReachedWinningGames = players.some(p => score(p) >= winningGames)
+
+    const leader = score(rankedPlayers[1]) < score(rankedPlayers[0]) ? rankedPlayers[0] : null
+    const winner = leader != null && score(leader) >= winningGames ? leader : null
 
     function PlayerUI({player}: { player: string }) {
         const madeMove = lastPlayers?.includes(player)
@@ -120,8 +125,8 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             <tr>
                 {players.map(player =>
                     <th key={player} className="text-nowrap" style={{width: '30%'}}>
-                        {you === player ? 'You' : <>Opponent</>}: {score(player)} {player == winner ?
-                        <span className="small text-success">[WINNER]</span> : null}
+                        {you === player ? 'You' : <>Opponent</>}: {score(player)} {player == leader ?
+                        <span className="small text-success">[{player === winner ? 'WINNER' : 'LEADER'}]</span> : null}
                     </th>)}
                 <th></th>
             </tr>
@@ -136,10 +141,11 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             <tr>
 
             </tr>
-            <tr>
+            {winner == null && <tr>
                 {players.map(player => <td key={player} className="align-middle"><PlayerUI player={player}/></td>)}
                 <td></td>
             </tr>
+            }
             </tbody>
         </table>
     </>
