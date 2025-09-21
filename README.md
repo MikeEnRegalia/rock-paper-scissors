@@ -1,28 +1,26 @@
 # Rock Paper Scissors
 
-## Backend API
+## Backend
 
-The backend is a run-of-the-mills Spring Boot application. You can run it in all the standard ways.
-
-NOTE: The frontend is hard-coded to look for the backend on port 8080.
+The backend is a typical Spring Boot application, providing a simple rest API.
 
 ## Web UI
 
-The frontend is a very basic Next.js project. To run it, go to the web-ui folder and run "npm run dev".
+The frontend is a very basic Next.js project. To run it, go to the web-ui folder and run "npm run dev". In development the frontend expects the backend api to run at localhost:8080.
 
 ## TODO / Areas For Improvement
 
 ### Frontend Tests
 
-Skipped for the time being
+Skipped for this assignment.
 
 ### Persistence
 
-In this prototype there is no persistence, but of course it can be added by expanding the Repository class.
+In this prototype there is no persistence, but of course it can easly be added by expanding the Repository class.
 
 ### More than 2 players
 
-There is rudimentary support in that the logic works, but the frontend as well as the Match data would need to be extended to properly show the scoring to the user
+There is rudimentary support in the game logic, but the frontend as well as the Match data would need to be extended to properly show the scoring to the user.
 
 ### Polling the Match Data
 
@@ -30,5 +28,5 @@ For production, such a use case would require push communication from the server
 
 ### Error Handling
 
-In the backend the error handling is implemented with exceptions in a redundant way both in the controllers and in the game model. This should be refactored to use return values. Can be done via sealed interfaces or more elegantly with Rich Errors (Kotlin 2.4+)
+In the backend the error handling is implemented with exceptions redundantly in both the controller and the business logic. This should be refactored to use return values in the business logic. Can be done via sealed interfaces or more elegantly with Rich Errors (Kotlin 2.4+)
 
