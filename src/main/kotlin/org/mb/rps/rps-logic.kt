@@ -6,26 +6,13 @@ import org.mb.rps.GameSymbol.*
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 enum class GameResult { WIN, DRAW, LOSS }
 
-fun computeResult(symbol: GameSymbol, otherSymbol: GameSymbol) = when (symbol) {
-    ROCK -> when (otherSymbol) {
-        SCISSORS -> WIN
-        ROCK -> DRAW
-        PAPER -> LOSS
-    }
-
-    PAPER -> when (otherSymbol) {
-        ROCK -> WIN
-        PAPER -> DRAW
-        SCISSORS -> LOSS
-    }
-
-    SCISSORS -> when (otherSymbol) {
-        PAPER -> WIN
-        SCISSORS -> DRAW
-        ROCK -> LOSS
-    }
+fun computeResult(player: GameSymbol, opponent: GameSymbol) = when {
+    player == ROCK && opponent == SCISSORS -> WIN
+    player == SCISSORS && opponent == PAPER -> WIN
+    player == PAPER && opponent == ROCK -> WIN
+    player == opponent -> DRAW
+    else -> LOSS
 }
-
 
 data class Match(
     val players: List<String> = listOf(),
