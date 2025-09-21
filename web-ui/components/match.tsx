@@ -139,8 +139,6 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             </tr>
             </tbody>
         </table>
-
-        <pre className="small mt-4 text-body-tertiary">{JSON.stringify(data, null, 4)}</pre>
     </>
 }
 
