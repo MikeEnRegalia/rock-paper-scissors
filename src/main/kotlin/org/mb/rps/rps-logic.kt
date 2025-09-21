@@ -27,24 +27,30 @@ data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
 fun Match.canMove(player: String) = player in players && currentGame.moves.none { it.player == player }
+fun Match.playerPairings() = players.flatMap { p -> players.filter { it > p }.map { p to it } }
+
 fun Match.makeMove(move: Move): Match {
     if (currentGame.moves.any { it.player == move.player }) throw IllegalStateException()
-
     val newMoves = currentGame.moves + move
-    if (newMoves.size < players.size) return copy(currentGame = currentGame.copy(moves = newMoves))
 
-    val wins = buildList {
-        for (player in players) for (otherPlayer in players) if (player > otherPlayer) {
-            val symbol = newMoves.single { it.player == player }.symbol
-            val otherSymbol = newMoves.single { it.player == otherPlayer }.symbol
+    return when {
+        newMoves.size < players.size -> copy(currentGame = currentGame.copy(moves = newMoves))
+        else -> copy(
+            playedGames = playedGames + PlayedGame(moves = newMoves, wins = computeWins(newMoves)),
+            currentGame = CurrentGame())
+    }
+}
 
-            when (computeResult(symbol, otherSymbol)) {
-                DRAW -> continue
-                WIN -> add(Win(player, otherPlayer))
-                LOSS -> add(Win(otherPlayer, player))
-            }
+private fun Match.computeWins(newMoves: List<Move>): List<Win> {
+    val wins = playerPairings().mapNotNull { (player, opponent) ->
+        val symbol = newMoves.single { it.player == player }.symbol
+        val otherSymbol = newMoves.single { it.player == opponent }.symbol
+
+        when (computeResult(symbol, otherSymbol)) {
+            DRAW -> null
+            WIN -> Win(player, opponent)
+            LOSS -> Win(opponent, player)
         }
     }
-
-    return copy(playedGames = playedGames + PlayedGame(moves = newMoves, wins = wins), currentGame = CurrentGame())
+    return wins
 }
