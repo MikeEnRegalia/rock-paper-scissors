@@ -13,16 +13,12 @@ interface Match {
     id: string
     players: string[]
     playedGames: PlayedGame[]
-    currentGame: OpenGame
+    openMoves: Move[]
 }
 
 interface PlayedGame {
     moves: Move[]
     wins: Win[]
-}
-
-interface OpenGame {
-    moves: Move[]
 }
 
 interface Move {
@@ -51,12 +47,12 @@ export function CreateMatchButton() {
     return <Button onClick={onClick} variant="link">New Match</Button>
 }
 
-function hasMoved(currentGame: OpenGame, player: string) {
-    return currentGame?.moves?.some(move => move.player === player)
+function hasMoved(openMoves: Move[], player: string) {
+    return openMoves.some(move => move.player === player)
 }
 
 function othersHaveMoved(match: Match, you: string) {
-    return match.players.every(p => p === you || hasMoved(match.currentGame, p))
+    return match.players.every(p => p === you || hasMoved(match.openMoves, p))
 }
 
 export function Match({matchId, player: you}: { matchId: string, player: string }) {
@@ -81,8 +77,8 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
         <h1>Rock Paper Scissors</h1>
     </>
 
-    const {players: originalPlayers, playedGames, currentGame} = data
-    const lastPlayers = currentGame.moves.map(move => move.player)
+    const {players: originalPlayers, playedGames, openMoves} = data
+    const lastPlayers = openMoves.map(move => move.player)
 
     const players = [you, ...originalPlayers.filter(p => p != you)]
 
@@ -100,7 +96,7 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             : <><Link href={`/matches/${matchId}/players/${player}`} target="_blank">Waiting</Link> <Spinner
                 size="sm"/></>
         return madeMove
-            ? currentGame.moves.find(m => m.player === player)?.symbol
+            ? openMoves.find(m => m.player === player)?.symbol
             : <DropdownButton title="Move">{gameSymbols.map(symbol =>
                 <DropdownItem key={symbol} onClick={async () => {
                     try {

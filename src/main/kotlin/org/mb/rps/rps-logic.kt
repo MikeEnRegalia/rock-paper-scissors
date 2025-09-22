@@ -18,32 +18,31 @@ data class Match(
     val id: String,
     val players: List<String> = listOf(),
     val playedGames: List<PlayedGame> = listOf(),
-    val currentGame: OpenGame = OpenGame()
+    val openMoves: List<Move> = listOf()
 )
 
 data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
-data class OpenGame(val moves: List<Move> = listOf())
 
 data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Match.canMove(player: String) = player in players && currentGame.moves.none { it.player == player }
+fun Match.canMove(player: String) = player in players && openMoves.none { it.player == player }
 
 fun Match.makeMove(move: Move): Match {
     if (!canMove(move.player)) throw IllegalStateException()
 
-    val moves = currentGame.moves + move
+    val moves = openMoves + move
     return when {
-        moves.size < players.size -> copy(currentGame = currentGame.copy(moves = moves))
+        moves.size < players.size -> copy(openMoves = moves)
         else -> copy(
             playedGames = playedGames + PlayedGame(moves, playerPairings().computeWins(moves)),
-            currentGame = OpenGame()
+            openMoves = listOf()
         )
     }
 }
 
-private fun List<Pair<String, String>>.computeWins(newMoves: List<Move>) = mapNotNull { (player, opponent) ->
-    when (newMoves.by(player).playedAgainst(newMoves.by(opponent))) {
+private fun List<Pair<String, String>>.computeWins(moves: List<Move>) = mapNotNull { (player, opponent) ->
+    when (moves.by(player).playedAgainst(moves.by(opponent))) {
         DRAW -> null
         WIN -> Win(player, opponent)
         LOSS -> Win(opponent, player)

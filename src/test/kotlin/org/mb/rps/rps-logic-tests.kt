@@ -34,7 +34,7 @@ class RpsLogicTests {
         val firstMove = Move(player1, ROCK)
         match = match.makeMove(firstMove)
 
-        assertThat(match.currentGame.moves).containsExactly(firstMove)
+        assertThat(match.openMoves).containsExactly(firstMove)
 
         assertThat(match.canMove(player1)).isFalse
         assertThrows(IllegalStateException::class.java) { match.makeMove(firstMove) }
@@ -47,7 +47,7 @@ class RpsLogicTests {
         assertThat(match.playedGames.first().wins).hasSize(1)
         assertThat(match.playedGames.first().wins.single()).isEqualTo(Win(player1, player2))
 
-        assertThat(match.currentGame.moves).isEmpty()
+        assertThat(match.openMoves).isEmpty()
 
         match = match.makeMove(Move(player2, PAPER))
         match = match.makeMove(Move(player1, PAPER))

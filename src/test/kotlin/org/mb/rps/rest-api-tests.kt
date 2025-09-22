@@ -42,8 +42,8 @@ class ApiTests {
 
         with(makeMove(match.id, player1, ROCK).body!!) {
             assertThat(playedGames).isEmpty()
-            assertThat(currentGame.moves).hasSize(1)
-            with(currentGame.moves[0]) {
+            assertThat(openMoves).hasSize(1)
+            with(openMoves[0]) {
                 assertThat(player).isEqualTo(player1)
                 assertThat(symbol).isEqualTo(ROCK)
             }
@@ -66,11 +66,11 @@ class ApiTests {
     @Test
     fun makeIllegalMoves() {
         val match = createMatch()
-        assertThat(makeIllegalMove(match.id, randomUUID().toString(), ROCK).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(makeIllegalMove(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
 
         val player = match.players[0]
         assertThat(makeMove(match.id, player, ROCK).statusCode).isEqualTo(OK)
-        assertThat(makeIllegalMove(match.id, player, ROCK).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(makeIllegalMove(match.id, player).statusCode).isEqualTo(BAD_REQUEST)
     }
 
     private fun createMatch() = restTemplate.postForObject(
@@ -84,9 +84,10 @@ class ApiTests {
         RpsController.MovePayload(player, symbol),
         Match::class.java
     )
-    private fun makeIllegalMove(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
+
+    private fun makeIllegalMove(id: String, player: String) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
-        RpsController.MovePayload(player, symbol),
+        RpsController.MovePayload(player, ROCK),
         String::class.java
     )
 }
