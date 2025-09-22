@@ -6,7 +6,7 @@ import org.mb.rps.GameSymbol.*
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 enum class GameResult { WIN, DRAW, LOSS }
 
-fun GameSymbol.playAgainst(opponent: GameSymbol) = when {
+fun GameSymbol.playedAgainst(opponent: GameSymbol) = when {
     this == ROCK && opponent == SCISSORS -> WIN
     this == SCISSORS && opponent == PAPER -> WIN
     this == PAPER && opponent == ROCK -> WIN
@@ -42,7 +42,7 @@ fun Match.makeMove(move: Move): Match {
 }
 
 private fun List<Pair<String, String>>.computeWins(newMoves: List<Move>) = mapNotNull { (player, opponent) ->
-    when (newMoves.by(player).playAgainst(newMoves.by(opponent))) {
+    when (newMoves.by(player).playedAgainst(newMoves.by(opponent))) {
         DRAW -> null
         WIN -> Win(player, opponent)
         LOSS -> Win(opponent, player)

@@ -14,9 +14,9 @@ class RpsLogicTests {
     @ParameterizedTest
     @CsvSource("ROCK,SCISSORS", "SCISSORS,PAPER", "PAPER,ROCK")
     fun testBasicGameLogic(player: GameSymbol, opponent: GameSymbol) {
-        expect(WIN, "$player beats $opponent") { player.playAgainst(opponent) }
-        expect(LOSS, "$opponent is beaten by $player") { opponent.playAgainst(player) }
-        expect(DRAW, "$player vs $player is a draw") { player.playAgainst(player) }
+        expect(WIN, "$player beats $opponent") { player.playedAgainst(opponent) }
+        expect(LOSS, "$opponent is beaten by $player") { opponent.playedAgainst(player) }
+        expect(DRAW, "$player vs $player is a draw") { player.playedAgainst(player) }
     }
 
     @Test
