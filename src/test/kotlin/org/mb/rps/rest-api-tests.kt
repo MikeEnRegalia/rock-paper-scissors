@@ -19,15 +19,7 @@ class ApiTests {
     private var port: Int? = null
 
     @Autowired
-    private lateinit var rpsController: RpsController
-
-    @Autowired
     private lateinit var restTemplate: TestRestTemplate
-
-    @Test
-    fun contextLoads() {
-        assertThat(rpsController).isNotNull
-    }
 
     @Test
     fun playMatch() {
