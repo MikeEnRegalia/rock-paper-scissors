@@ -57,13 +57,13 @@ class ApiTests {
     }
 
     @Test
-    fun makeIllegalMoves() {
+    fun playIllegalMoves() {
         val match = createMatch()
-        assertThat(playIllegal(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(playIllegalMove(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
 
         val player = match.players[0]
         assertThat(play(match.id, player, ROCK).statusCode).isEqualTo(OK)
-        assertThat(playIllegal(match.id, player).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(playIllegalMove(match.id, player).statusCode).isEqualTo(BAD_REQUEST)
     }
 
     private fun createMatch() = restTemplate.postForObject(
@@ -78,7 +78,7 @@ class ApiTests {
         Match::class.java
     )
 
-    private fun playIllegal(id: String, player: String) = restTemplate.postForEntity(
+    private fun playIllegalMove(id: String, player: String) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
         Move(player, ROCK),
         String::class.java
