@@ -10,14 +10,16 @@ The frontend is a very basic Next.js project. To run it, go to the web-ui folder
 
 ## Ideas for Improvement / Known Limitations
 
-- add persistence in the backend repo
-- refactor api so that players cannot see each other's moves
-- use SWR for the two POST endpoints
-- show errors/loading spinner/feedback for all SWR hooks
-- Use web sockets to push state to the UI
-- replace redundant exception based error handling in the backend with return values (preferably: use Rich Errors, which will be available in Kotlin 2.4+)
-- fully support more than two players
-- add frontend tests
+- add persistence in the backend repo.
+- refactor api so that players cannot see each other's moves.
+- use SWR for the two POST endpoints.
+- show errors/loading spinner/feedback for all SWR hooks.
+- Use web sockets to push state to the UI.
+- replace redundant exception based error handling in the backend with return values (preferably: use Rich Errors, which will be available in Kotlin 2.4+).
+- fully support more than two players.
+- add frontend tests.
+- in the api there is no separation between controllers and services. This avoids a lot of redundancy, but as operations become more complex, the layers should be separated.
+- Although somewhat redundant, DTOs and mappings to business logic classes should be added when transitioning from prototype to production.
 
 ### CQRS
 
