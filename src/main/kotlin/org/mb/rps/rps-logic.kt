@@ -15,6 +15,7 @@ fun GameSymbol.playAgainst(opponent: GameSymbol) = when {
 }
 
 data class Match(
+    val id: String,
     val players: List<String> = listOf(),
     val playedGames: List<PlayedGame> = listOf(),
     val currentGame: CurrentGame = CurrentGame()

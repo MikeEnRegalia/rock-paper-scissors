@@ -31,7 +31,7 @@ class ApiTests {
 
     @Test
     fun playMatch() {
-        val (id, match) = createMatch()
+        val match = createMatch()
 
         assertThat(match.players).hasSize(2)
         assertThat(match.players.toSet()).hasSize(2)
@@ -40,7 +40,7 @@ class ApiTests {
         val player1 = match.players[0]
         val player2 = match.players[1]
 
-        with(makeMove(id, player1, ROCK).body!!) {
+        with(makeMove(match.id, player1, ROCK).body!!) {
             assertThat(playedGames).isEmpty()
             assertThat(currentGame.moves).hasSize(1)
             with(currentGame.moves[0]) {
@@ -49,7 +49,7 @@ class ApiTests {
             }
         }
 
-        with(makeMove(id, player2, PAPER).body!!.playedGames.first()) {
+        with(makeMove(match.id, player2, PAPER).body!!.playedGames.first()) {
             assertThat(wins.map { it.winner }).containsOnly(player2)
         }
     }
@@ -65,23 +65,28 @@ class ApiTests {
 
     @Test
     fun makeIllegalMoves() {
-        val (id, match) = createMatch()
-        assertThat(makeMove(id, randomUUID().toString(), ROCK).statusCode).isEqualTo(BAD_REQUEST)
+        val match = createMatch()
+        assertThat(makeIllegalMove(match.id, randomUUID().toString(), ROCK).statusCode).isEqualTo(BAD_REQUEST)
 
         val player = match.players[0]
-        assertThat(makeMove(id, player, ROCK).statusCode).isEqualTo(OK)
-        assertThat(makeMove(id, player, ROCK).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(makeMove(match.id, player, ROCK).statusCode).isEqualTo(OK)
+        assertThat(makeIllegalMove(match.id, player, ROCK).statusCode).isEqualTo(BAD_REQUEST)
     }
 
     private fun createMatch() = restTemplate.postForObject(
         "http://localhost:$port/rps/matches",
         "",
-        RpsController.MatchCreatedResponse::class.java
+        Match::class.java
     )
 
     private fun makeMove(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
         RpsController.MovePayload(player, symbol),
         Match::class.java
+    )
+    private fun makeIllegalMove(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
+        "http://localhost:$port/rps/matches/$id/moves",
+        RpsController.MovePayload(player, symbol),
+        String::class.java
     )
 }

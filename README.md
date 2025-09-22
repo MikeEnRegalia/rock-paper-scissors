@@ -30,10 +30,6 @@ For production, such a use case would require push communication from the server
 
 In the backend the error handling is implemented with exceptions redundantly in both the controller and the business logic. This should be refactored to use return values in the business logic. Can be done via sealed interfaces or more elegantly with Rich Errors (Kotlin 2.4+)
 
-### TODO: put id into Match
-
-It is a little redundant, but putting the match id inside the Match class simplifies the code.
-
 ### CQRS
 
 The code is prepared for CQRS a little bit: There are basically two commands (POST endpoints) and one query (GET endpoint). In this implementation there is no separation, but we could introduce a more basic repository which only stores the matches (id, player ids) and moves, and upon each match creation and move update the more elaborate view currently represented by the Match class.

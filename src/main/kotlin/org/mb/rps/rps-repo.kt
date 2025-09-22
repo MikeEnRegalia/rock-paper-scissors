@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service
 class RpsRepository {
     private val matches = mutableMapOf<String, Match>()
 
-    fun createMatch(id: String, match: Match) = id to match
-        .also { matches[id] = it }
+    fun storeNewMatch(match: Match) {
+        if (match.id in matches) throw IllegalArgumentException("match id ${match.id} already exists")
+        matches[match.id] = match
+    }
 
-    fun getMatch(id: String): Match? = matches[id]
+    fun getMatch(id: String) = matches[id]
 
-    fun updateMatch(id: String, match: Match) {
-        matches[id] = match
+    fun updateMatch(match: Match) {
+        if (match.id !in matches) throw IllegalArgumentException("match id ${match.id} does not exist")
+        matches[match.id] = match
     }
 }

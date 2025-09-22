@@ -24,7 +24,7 @@ class RpsLogicTests {
         val player1 = "A"
         val player2 = "B"
 
-        var match = Match(listOf(player1, player2))
+        var match = Match("1", listOf(player1, player2))
         assertThat(match.playedGames).isEmpty()
 
         assertThat(match.canMove(player1)).isTrue

@@ -9,12 +9,8 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
 const winningGames = 3
 
-interface MatchWithId {
-    id: string
-    match: Match
-}
-
 interface Match {
+    id: string
     players: string[]
     playedGames: PlayedGame[]
     currentGame: OpenGame
@@ -46,8 +42,8 @@ export function CreateMatchButton() {
     const router = useRouter()
     const onClick = async () => {
         try {
-            const {id, match} = await createGame()
-            router.push(`/matches/${id}/players/${match.players[0]}`)
+            const match = await createGame()
+            router.push(`/matches/${match.id}/players/${match.players[0]}`)
         } catch (error) {
             console.log(error)
         }
@@ -93,7 +89,6 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
     const score = (player: string) => playedGames.flatMap(game => game.wins.filter(win => win.winner === player)).length
 
     const rankedPlayers = [...players].sort((a, b) => score(b) - score(a))
-    const haveReachedWinningGames = players.some(p => score(p) >= winningGames)
 
     const leader = score(rankedPlayers[1]) < score(rankedPlayers[0]) ? rankedPlayers[0] : null
     const winner = leader != null && score(leader) >= winningGames ? leader : null
@@ -167,7 +162,7 @@ function getMoveCSS(wins: Win[], player: string) {
 async function createGame() {
     const response = await fetch(`${backendUrl}/matches`, {method: 'POST'})
     if (!response.ok) throw new Error(response.statusText)
-    return await response.json() as MatchWithId
+    return await response.json() as Match
 }
 
 async function makeMove(matchId: string, player: string, symbol: GameSymbol) {

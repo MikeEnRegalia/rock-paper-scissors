@@ -13,12 +13,11 @@ import java.util.UUID.randomUUID
 @RequestMapping("/rps")
 @CrossOrigin
 class RpsController(private val repo: RpsRepository) {
-    data class MatchCreatedResponse(val id: String, val match: Match)
 
     @PostMapping("/matches")
-    fun createMatch(): ResponseEntity<MatchCreatedResponse> = ok(
-        repo.createMatch(randomUUID().toString(), Match(listOf(randomUUID(), randomUUID()).map { it.toString() }))
-            .let { (id, match) -> MatchCreatedResponse(id, match) }
+    fun createMatch(): ResponseEntity<Match> = ok(
+        Match(randomUUID().toString(), listOf(randomUUID(), randomUUID()).map { it.toString() })
+            .also { repo.storeNewMatch(it) }
     )
 
     @GetMapping("/matches/{id}")
@@ -34,7 +33,7 @@ class RpsController(private val repo: RpsRepository) {
         if (!match.canMove(req.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
 
         val newMatch = match.makeMove(Move(req.player, req.symbol))
-        repo.updateMatch(matchId, newMatch)
+        repo.updateMatch(newMatch)
         return ok(newMatch)
     }
 }
