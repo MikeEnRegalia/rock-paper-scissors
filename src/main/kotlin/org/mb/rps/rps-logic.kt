@@ -18,11 +18,11 @@ data class Match(
     val id: String,
     val players: List<String> = listOf(),
     val playedGames: List<PlayedGame> = listOf(),
-    val currentGame: CurrentGame = CurrentGame()
+    val currentGame: OpenGame = OpenGame()
 )
 
 data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
-data class CurrentGame(val moves: List<Move> = listOf())
+data class OpenGame(val moves: List<Move> = listOf())
 
 data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
@@ -34,11 +34,14 @@ fun Match.makeMove(move: Move): Match {
     val moves = currentGame.moves + move
     return when {
         moves.size < players.size -> copy(currentGame = currentGame.copy(moves = currentGame.moves + move))
-        else -> copy(playedGames = playedGames + PlayedGame(moves, computeWins(moves)), currentGame = CurrentGame())
+        else -> copy(
+            playedGames = playedGames + PlayedGame(moves, playerPairings().computeWins(moves)),
+            currentGame = OpenGame()
+        )
     }
 }
 
-private fun Match.computeWins(newMoves: List<Move>) = playerPairings().mapNotNull { (player, opponent) ->
+private fun List<Pair<String, String>>.computeWins(newMoves: List<Move>) = mapNotNull { (player, opponent) ->
     when (newMoves.by(player).playAgainst(newMoves.by(opponent))) {
         DRAW -> null
         WIN -> Win(player, opponent)
