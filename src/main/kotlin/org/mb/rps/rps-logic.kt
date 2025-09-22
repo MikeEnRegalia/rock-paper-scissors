@@ -7,7 +7,7 @@ import java.util.UUID.randomUUID
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 enum class GameResult { WIN, DRAW, LOSS }
 
-fun GameSymbol.playedAgainst(opponent: GameSymbol) = when {
+fun GameSymbol.meets(opponent: GameSymbol) = when {
     this == ROCK && opponent == SCISSORS -> WIN
     this == SCISSORS && opponent == PAPER -> WIN
     this == PAPER && opponent == ROCK -> WIN
@@ -27,10 +27,10 @@ data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = li
 data class Move(val player: String, val symbol: GameSymbol)
 data class Win(val winner: String, val loser: String)
 
-fun Match.canMove(player: String) = player in players && openMoves.none { it.player == player }
+fun Match.canPlay(player: String) = player in players && openMoves.none { it.player == player }
 
 fun Match.play(move: Move): Match {
-    if (!canMove(move.player)) throw IllegalStateException()
+    if (!canPlay(move.player)) throw IllegalStateException()
 
     val moves = openMoves + move
     return when {
@@ -43,7 +43,7 @@ fun Match.play(move: Move): Match {
 }
 
 private fun List<Pair<String, String>>.computeWins(moves: List<Move>) = mapNotNull { (player, opponent) ->
-    when (moves.by(player).playedAgainst(moves.by(opponent))) {
+    when (moves.by(player).meets(moves.by(opponent))) {
         DRAW -> null
         WIN -> Win(player, opponent)
         LOSS -> Win(opponent, player)

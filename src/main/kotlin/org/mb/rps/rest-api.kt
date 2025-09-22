@@ -24,7 +24,7 @@ class RpsController(private val repo: RpsRepository) {
     fun postMove(@PathVariable matchId: String, @RequestBody move: Move): ResponseEntity<Match> {
         val match = repo.getMatch(matchId) ?: throw ResponseStatusException(NOT_FOUND)
         if (move.player !in match.players) throw ResponseStatusException(BAD_REQUEST, "player is unknown")
-        if (!match.canMove(move.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
+        if (!match.canPlay(move.player)) throw ResponseStatusException(BAD_REQUEST, "player has already moved")
 
         return match.play(move)
             .also { repo.storeUpdatedMatch(it) }

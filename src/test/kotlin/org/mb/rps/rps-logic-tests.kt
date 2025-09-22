@@ -14,9 +14,9 @@ class RpsLogicTests {
     @ParameterizedTest
     @CsvSource("ROCK,SCISSORS", "SCISSORS,PAPER", "PAPER,ROCK")
     fun testBasicGameLogic(player: GameSymbol, opponent: GameSymbol) {
-        expect(WIN, "$player beats $opponent") { player.playedAgainst(opponent) }
-        expect(LOSS, "$opponent is beaten by $player") { opponent.playedAgainst(player) }
-        expect(DRAW, "$player vs $player is a draw") { player.playedAgainst(player) }
+        expect(WIN, "$player beats $opponent") { player.meets(opponent) }
+        expect(LOSS, "$opponent is beaten by $player") { opponent.meets(player) }
+        expect(DRAW, "$player vs $player is a draw") { player.meets(player) }
     }
 
     @Test
@@ -27,16 +27,16 @@ class RpsLogicTests {
         var match = Match("1", listOf(player1, player2))
         assertThat(match.playedGames).isEmpty()
 
-        assertThat(match.canMove(player1)).isTrue
-        assertThat(match.canMove(player2)).isTrue
-        assertThat(match.canMove("C")).isFalse
+        assertThat(match.canPlay(player1)).isTrue
+        assertThat(match.canPlay(player2)).isTrue
+        assertThat(match.canPlay("C")).isFalse
 
         val firstMove = Move(player1, ROCK)
         match = match.play(firstMove)
 
         assertThat(match.openMoves).containsExactly(firstMove)
 
-        assertThat(match.canMove(player1)).isFalse
+        assertThat(match.canPlay(player1)).isFalse
         assertThrows(IllegalStateException::class.java) { match.play(firstMove) }
 
         val secondMove = Move(player2, SCISSORS)
