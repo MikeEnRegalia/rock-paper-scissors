@@ -30,10 +30,11 @@ data class Win(val winner: String, val loser: String)
 fun Match.canMove(player: String) = player in players && currentGame.moves.none { it.player == player }
 
 fun Match.makeMove(move: Move): Match {
-    if (currentGame.moves.any { it.player == move.player }) throw IllegalStateException()
+    if (!canMove(move.player)) throw IllegalStateException()
+
     val moves = currentGame.moves + move
     return when {
-        moves.size < players.size -> copy(currentGame = currentGame.copy(moves = currentGame.moves + move))
+        moves.size < players.size -> copy(currentGame = currentGame.copy(moves = moves))
         else -> copy(
             playedGames = playedGames + PlayedGame(moves, playerPairings().computeWins(moves)),
             currentGame = OpenGame()
