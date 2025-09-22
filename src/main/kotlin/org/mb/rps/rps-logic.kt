@@ -2,6 +2,7 @@ package org.mb.rps
 
 import org.mb.rps.GameResult.*
 import org.mb.rps.GameSymbol.*
+import java.util.UUID.randomUUID
 
 enum class GameSymbol { ROCK, PAPER, SCISSORS }
 enum class GameResult { WIN, DRAW, LOSS }
@@ -15,8 +16,8 @@ fun GameSymbol.playedAgainst(opponent: GameSymbol) = when {
 }
 
 data class Match(
-    val id: String,
-    val players: List<String> = listOf(),
+    val id: String = randomUUID().toString(),
+    val players: List<String> = listOf(randomUUID(), randomUUID()).map { it.toString() },
     val playedGames: List<PlayedGame> = listOf(),
     val openMoves: List<Move> = listOf()
 )
@@ -28,7 +29,7 @@ data class Win(val winner: String, val loser: String)
 
 fun Match.canMove(player: String) = player in players && openMoves.none { it.player == player }
 
-fun Match.makeMove(move: Move): Match {
+fun Match.play(move: Move): Match {
     if (!canMove(move.player)) throw IllegalStateException()
 
     val moves = openMoves + move

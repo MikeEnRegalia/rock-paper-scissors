@@ -40,7 +40,7 @@ class ApiTests {
         val player1 = match.players[0]
         val player2 = match.players[1]
 
-        with(makeMove(match.id, player1, ROCK).body!!) {
+        with(play(match.id, player1, ROCK).body!!) {
             assertThat(playedGames).isEmpty()
             assertThat(openMoves).hasSize(1)
             with(openMoves[0]) {
@@ -49,7 +49,7 @@ class ApiTests {
             }
         }
 
-        with(makeMove(match.id, player2, PAPER).body!!.playedGames.first()) {
+        with(play(match.id, player2, PAPER).body!!.playedGames.first()) {
             assertThat(wins.map { it.winner }).containsOnly(player2)
         }
     }
@@ -66,11 +66,11 @@ class ApiTests {
     @Test
     fun makeIllegalMoves() {
         val match = createMatch()
-        assertThat(makeIllegalMove(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(playIllegal(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
 
         val player = match.players[0]
-        assertThat(makeMove(match.id, player, ROCK).statusCode).isEqualTo(OK)
-        assertThat(makeIllegalMove(match.id, player).statusCode).isEqualTo(BAD_REQUEST)
+        assertThat(play(match.id, player, ROCK).statusCode).isEqualTo(OK)
+        assertThat(playIllegal(match.id, player).statusCode).isEqualTo(BAD_REQUEST)
     }
 
     private fun createMatch() = restTemplate.postForObject(
@@ -79,15 +79,15 @@ class ApiTests {
         Match::class.java
     )
 
-    private fun makeMove(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
+    private fun play(id: String, player: String, symbol: GameSymbol) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
-        RpsController.MovePayload(player, symbol),
+        Move(player, symbol),
         Match::class.java
     )
 
-    private fun makeIllegalMove(id: String, player: String) = restTemplate.postForEntity(
+    private fun playIllegal(id: String, player: String) = restTemplate.postForEntity(
         "http://localhost:$port/rps/matches/$id/moves",
-        RpsController.MovePayload(player, ROCK),
+        Move(player, ROCK),
         String::class.java
     )
 }

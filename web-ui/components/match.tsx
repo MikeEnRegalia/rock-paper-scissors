@@ -100,7 +100,7 @@ export function Match({matchId, player: you}: { matchId: string, player: string 
             : <DropdownButton title="Move">{gameSymbols.map(symbol =>
                 <DropdownItem key={symbol} onClick={async () => {
                     try {
-                        await mutate(await makeMove(matchId, player, symbol))
+                        await mutate(await play(matchId, player, symbol))
                     } catch (error) {
                         console.log(error)
                     }
@@ -161,7 +161,7 @@ async function createGame() {
     return await response.json() as Match
 }
 
-async function makeMove(matchId: string, player: string, symbol: GameSymbol) {
+async function play(matchId: string, player: string, symbol: GameSymbol) {
     const response = await fetch(`${backendUrl}/matches/${matchId}/moves`, {
         method: 'POST',
         body: JSON.stringify({player, symbol}),

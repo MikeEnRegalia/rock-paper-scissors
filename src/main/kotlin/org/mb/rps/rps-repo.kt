@@ -16,7 +16,7 @@ class RpsRepository {
 
     fun getMatch(id: String) = matches[id]
 
-    fun updateMatch(match: Match) {
+    fun storeUpdatedMatch(match: Match) {
         synchronized(matches) {
             if (match.id !in matches) throw IllegalArgumentException("match id ${match.id} does not exist")
             matches[match.id] = match

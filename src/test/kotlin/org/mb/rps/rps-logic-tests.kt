@@ -32,15 +32,15 @@ class RpsLogicTests {
         assertThat(match.canMove("C")).isFalse
 
         val firstMove = Move(player1, ROCK)
-        match = match.makeMove(firstMove)
+        match = match.play(firstMove)
 
         assertThat(match.openMoves).containsExactly(firstMove)
 
         assertThat(match.canMove(player1)).isFalse
-        assertThrows(IllegalStateException::class.java) { match.makeMove(firstMove) }
+        assertThrows(IllegalStateException::class.java) { match.play(firstMove) }
 
         val secondMove = Move(player2, SCISSORS)
-        match = match.makeMove(secondMove)
+        match = match.play(secondMove)
 
         assertThat(match.playedGames).hasSize(1)
         assertThat(match.playedGames.first().moves).containsExactly(firstMove, secondMove)
@@ -49,8 +49,8 @@ class RpsLogicTests {
 
         assertThat(match.openMoves).isEmpty()
 
-        match = match.makeMove(Move(player2, PAPER))
-        match = match.makeMove(Move(player1, PAPER))
+        match = match.play(Move(player2, PAPER))
+        match = match.play(Move(player1, PAPER))
 
         assertThat(match.playedGames).hasSize(2)
         assertThat(match.playedGames.last().wins).isEmpty()
