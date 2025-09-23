@@ -25,34 +25,42 @@ class RpsLogicTests {
         val player2 = "B"
 
         var match = Match("1", listOf(player1, player2))
-        assertThat(match.playedGames).isEmpty()
+        with(match) {
+            assertThat(playedGames).isEmpty()
 
-        assertThat(match.canPlay(player1)).isTrue
-        assertThat(match.canPlay(player2)).isTrue
-        assertThat(match.canPlay("C")).isFalse
+            assertThat(canPlay(player1)).isTrue
+            assertThat(canPlay(player2)).isTrue
+            assertThat(canPlay("C")).isFalse
+        }
 
         val firstMove = Move(player1, ROCK)
         match = match.play(firstMove)
 
-        assertThat(match.openMoves).containsExactly(firstMove)
+        with(match) {
+            assertThat(openMoves).containsExactly(firstMove)
 
-        assertThat(match.canPlay(player1)).isFalse
-        assertThrows(IllegalStateException::class.java) { match.play(firstMove) }
+            assertThat(canPlay(player1)).isFalse
+            assertThrows(IllegalStateException::class.java) { play(firstMove) }
+        }
 
         val secondMove = Move(player2, SCISSORS)
         match = match.play(secondMove)
 
-        assertThat(match.playedGames).hasSize(1)
-        assertThat(match.playedGames.first().moves).containsExactly(firstMove, secondMove)
-        assertThat(match.playedGames.first().wins).hasSize(1)
-        assertThat(match.playedGames.first().wins.single()).isEqualTo(Win(player1, player2))
+        with(match) {
+            assertThat(playedGames).hasSize(1)
+            assertThat(playedGames.first().moves).containsExactly(firstMove, secondMove)
+            assertThat(playedGames.first().wins).hasSize(1)
+            assertThat(playedGames.first().wins.single()).isEqualTo(Win(player1, player2))
 
-        assertThat(match.openMoves).isEmpty()
+            assertThat(openMoves).isEmpty()
+        }
 
         match = match.play(Move(player2, PAPER))
         match = match.play(Move(player1, PAPER))
 
-        assertThat(match.playedGames).hasSize(2)
-        assertThat(match.playedGames.last().wins).isEmpty()
+        with(match) {
+            assertThat(playedGames).hasSize(2)
+            assertThat(playedGames.last().wins).isEmpty()
+        }
     }
 }

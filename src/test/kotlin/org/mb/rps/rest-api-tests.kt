@@ -11,7 +11,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus.*
 import java.util.UUID.randomUUID
-import kotlin.test.expect
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ApiTests {
@@ -48,16 +47,28 @@ class ApiTests {
     }
 
     @Test
-    fun loadNonExistingMatch() {
-        val response = restTemplate.getForEntity(
-            "http://localhost:$port/rps/matches/${randomUUID()}",
-            String::class.java
-        )
-        expect(NOT_FOUND) { response.statusCode }
+    fun loadMatch() {
+
+        assertThat(
+            restTemplate.getForEntity(
+                "http://localhost:${port}/rps/matches/${randomUUID()}",
+                Match::class.java
+            ).statusCode
+        ).isEqualTo(NOT_FOUND)
+
+        val existingMatch = createMatch()
+        assertThat(
+            restTemplate.getForObject(
+                "http://localhost:${port}/rps/matches/${existingMatch.id}",
+                Match::class.java
+            )
+        ).isEqualTo(existingMatch)
     }
 
     @Test
     fun playIllegalMoves() {
+        assertThat(playIllegalMove("42", randomUUID().toString()).statusCode).isEqualTo(NOT_FOUND)
+
         val match = createMatch()
         assertThat(playIllegalMove(match.id, randomUUID().toString()).statusCode).isEqualTo(BAD_REQUEST)
 
