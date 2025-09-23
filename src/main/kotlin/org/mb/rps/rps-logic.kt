@@ -25,7 +25,10 @@ data class Match(
 data class PlayedGame(val moves: List<Move> = listOf(), val wins: List<Win> = listOf())
 
 data class Move(val player: String, val symbol: GameSymbol)
+fun String.plays(symbol: GameSymbol) = Move(this, symbol)
+
 data class Win(val winner: String, val loser: String)
+fun String.winsAgainst(loser: String) = Win(this, loser)
 
 fun Match.canPlay(player: String) = player in players && openMoves.none { it.player == player }
 
@@ -45,8 +48,8 @@ fun Match.play(move: Move): Match {
 private fun List<Pair<String, String>>.computeWins(moves: List<Move>) = mapNotNull { (player, opponent) ->
     when (moves.by(player).meets(moves.by(opponent))) {
         DRAW -> null
-        WIN -> Win(player, opponent)
-        LOSS -> Win(opponent, player)
+        WIN -> player.winsAgainst(opponent)
+        LOSS -> opponent.winsAgainst(player)
     }
 }
 

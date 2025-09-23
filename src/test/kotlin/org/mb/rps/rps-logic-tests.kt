@@ -21,7 +21,7 @@ class RpsLogicTests {
 
     @ParameterizedTest
     @CsvSource("ROCK,SCISSORS", "SCISSORS,PAPER", "PAPER,ROCK")
-    fun testScoringLogic(player: GameSymbol, opponent: GameSymbol) {
+    fun testScoringLogic(winningMove: GameSymbol, losingMove: GameSymbol) {
         val players = listOf("A", "B")
 
         fun playMatch(vararg moves: Move): List<Int> {
@@ -32,15 +32,15 @@ class RpsLogicTests {
         }
 
         expect(listOf(1, 0)) {
-            playMatch(Move(players[0], player), Move(players[1], opponent))
+            playMatch(players[0].plays(winningMove), players[1].plays( losingMove))
         }
 
         expect(listOf(0, 1)) {
-            playMatch(Move(players[1], player), Move(players[0], opponent))
+            playMatch(players[1].plays( winningMove), players[0].plays( losingMove))
         }
 
         expect(listOf(0, 0)) {
-            playMatch(Move(players[0], player), Move(players[1], player))
+            playMatch(players[0].plays( winningMove), players[1].plays( winningMove))
         }
     }
 
